@@ -18,7 +18,7 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <run_depend>ohm_rrl_motiondetection</run_depend>
-
+  <run_depend>ohm_rrl_perception_launch</run_depend>
   <export>
     <metapackage/>
   </export>
