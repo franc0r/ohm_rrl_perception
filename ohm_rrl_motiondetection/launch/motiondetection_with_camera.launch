@@ -1,15 +1,15 @@
 <launch>
 
    <node pkg="usb_cam" type="usb_cam_node" name="usb_cam">
-     <param name="camera_name"     value="driver_cam"/>
+     <param name="camera_name"     value="driver_cam" />
      <param name="camera_frame_id" value="driver_cam" />
-     
+     <param name="pixel_format"    value="yuyv"       />
    </node>
    
 
    <!-- Motion detection node -->
-   <node name="motiondetection" pkg="ohm_motiondetection" type="ohm_motiondetection_node" output="screen">
-      <param name="image_topic"          type="string"  value="usb_cam/image_raw"/>            <!-- topic to subscribe camera              -->
+   <node name="motiondetection" pkg="ohm_rrl_motiondetection" type="ohm_motiondetection_node" output="screen">
+      <param name="image_topic"          type="string"  value="usb_cam/image_raw"/>    <!-- topic to subscribe camera              -->
       <param name="motion_image_topic"   type="string"  value="motion_image_topic"/>   <!-- topic for image publisher with markers --> 
       <param name="debug"                type="bool"    value="false"/>                <!-- remove output from node image          -->
       <param name="rect_topic"           type="string"  value="notification_rect"/>    <!-- publisher topic for rect in gui        -->
