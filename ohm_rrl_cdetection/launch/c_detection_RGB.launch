@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
 <launch>
 	<node pkg="image_transport" name="republish" type="republish" output="screen" args="compressed in:=/gripper/color/image_raw raw out:=/gripper/color/image_raw"/>
-	<node pkg="ohm_rrl_cdetection" name="ohm_rrl_cdetection" type="ohm_rrl_cdetection" output="screen" />
+	<node pkg="ohm_rrl_cdetection" name="auto_c_detect_node" type="auto_c_detect_node" output="screen" />
 </launch>

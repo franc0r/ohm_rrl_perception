@@ -235,10 +235,10 @@ int main( int argc, char** argv )
 
 
   //Subscriber Realsense D415
-  image_transport::Subscriber imgSub = it.subscribe("/gripper/color/image_raw",1, callCam);
-  pubGray = it.advertise("/gripper/image_gray", 1);
-  pubContours = it.advertise("/gripper/image_contours", 1);
-  pubDetected = it.advertise("/gripper/detected_contours", 1);
+  image_transport::Subscriber imgSub = it.subscribe("/thermal_image_view",1, callCam);
+  pubGray = it.advertise("/thermal/image_gray", 1);
+  pubContours = it.advertise("/thermal/image_contours", 1);
+  pubDetected = it.advertise("/thermal/detected_contours", 1);
 
 
   // Look for data
