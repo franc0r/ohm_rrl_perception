@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(ohm_rrl_perception_utility)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++11)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -11,7 +11,18 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   roscpp
   std_msgs
+  image_transport
+  cv_bridge
 )
+
+
+if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
+  find_package(Qt5Widgets REQUIRED)
+else()
+  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
+  include(${QT_USE_FILE})
+endif()
+
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -134,7 +145,7 @@ include_directories(
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/ohm_rrl_perception_utility_node.cpp)
-add_executable(${PROJECT_NAME}_node src/ohm_convert_findObject2D_toRect.cpp)
+add_executable(hazmat_viz_node src/ohm_convert_findObject2D_toRect.cpp)
 
 
 
@@ -149,9 +160,10 @@ add_executable(${PROJECT_NAME}_node src/ohm_convert_findObject2D_toRect.cpp)
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+ target_link_libraries(hazmat_viz_node
+   ${catkin_LIBRARIES}
+   ${QT_LIBRARIES} 
+ )
 
 #############
 ## Install ##

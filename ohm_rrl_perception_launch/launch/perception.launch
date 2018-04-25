@@ -1,5 +1,39 @@
 <launch>
 
+  <arg name="with_camera" default="false"/>
+  <arg name="with_viewer" default="false"/>
+  
+  
+  <!-- start camera -->
+  <group if="$(arg with_camera)">
+   <node pkg="usb_cam" type="usb_cam_node" name="usb_cam">
+     <param name="camera_name"     value="driver_cam" />
+     <param name="camera_frame_id" value="driver_cam" />
+     <param name="pixel_format"    value="yuyv"       />
+     
+     <remap from="/usb_cam/image_raw" to="/img_perception"/>
 
+   </node>
+  </group>
+  
+  
+  <include file="$(find ohm_rrl_motiondetection)/launch/motiondetection.launch" >
+      <arg name="input_image_topic" value="img_perception" />
+      <arg name="img_motion_topic"  value="img_motion" />
+  </include>  
+  
+  
+  <include file="$(find ohm_rrl_perception_utility)/launch/hazmatdetection.launch" >
+      <arg name="input_image_topic" value="img_perception" />
+      <arg name="img_haz_topic"     value="img_hazmats" />
+  </include>  
+  
+  
+  
+  
+
+  <group if="$(arg with_viewer)">
+    <node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />
+  </group>
 
 </launch>

@@ -124,13 +124,13 @@ cv::Mat MotionDetectionNode::calculateContours(const sensor_msgs::ImageConstPtr&
    }
 
    cv::Mat     frame(cv_ptr->image);
-   cv::Mat     back, front;
+   cv::Mat     back, front, blurred;
 
    // apply gaussian blurring to reduce noise
    const auto kernel_size = _config.bluring_factor*2 + 1;
-   cv::GaussianBlur(frame, frame, cv::Size(kernel_size,kernel_size),kernel_size,kernel_size);
+   cv::GaussianBlur(frame, blurred, cv::Size(kernel_size,kernel_size),kernel_size,kernel_size);
 
-   _bg->apply(frame, front, -1); // automatic learning rate
+   _bg->apply(blurred, front, -1); // automatic learning rate
    _bg->getBackgroundImage(back);
 
    cv::erode( front, front, cv::Mat());
