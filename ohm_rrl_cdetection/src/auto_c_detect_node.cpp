@@ -1,7 +1,7 @@
 ﻿/**
  * @file   auto_c_detect_node.cpp
  * @author Johanna Gleichauf
- * @date   Stand 04.05.2017
+ * @date   Stand 25.04.2018
  *
  *
  */
