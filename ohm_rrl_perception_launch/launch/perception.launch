@@ -7,6 +7,7 @@
   <!-- start camera -->
   <group if="$(arg with_camera)">
    <node pkg="usb_cam" type="usb_cam_node" name="usb_cam">
+     <param name="video_device"    value="/dev/video0"/>
      <param name="camera_name"     value="driver_cam" />
      <param name="camera_frame_id" value="driver_cam" />
      <param name="pixel_format"    value="yuyv"       />
@@ -35,6 +36,8 @@
   </include> 
   
   
+  <include file="$(find ohm_rrl_cdetection)/launch/c_detection_RGB.launch" >
+  </include>
   
   
 
