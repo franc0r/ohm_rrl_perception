@@ -1,0 +1,60 @@
+id: 0
+u: 98
+v: 68
+data: Y_01_chair_002%_yolks
+pose: 
+  position: 
+    x: -0.52297
+    y: -1.94247
+    z: 0
+  orientation: 
+    x: 0
+    y: 0
+    z: 0
+    w: 0
+
+id: 1
+u: 200
+v: 97
+data: Y_01_chair_002%_yolks
+pose: 
+  position: 
+    x: 1.45137
+    y: -1.22369
+    z: 0
+  orientation: 
+    x: 0
+    y: 0
+    z: 0
+    w: 0
+
+id: 2
+u: 256
+v: 188
+data: Y_01_chair_002%_yolks
+pose: 
+  position: 
+    x: 1.43315
+    y: 0.232666
+    z: 0
+  orientation: 
+    x: 0
+    y: 0
+    z: 0
+    w: 0
+
+id: 3
+u: 50
+v: 241
+data: Y_01_chair_002%_yolks
+pose: 
+  position: 
+    x: 0.195654
+    y: -0.418002
+    z: 0
+  orientation: 
+    x: 0
+    y: 0
+    z: 0
+    w: 0
+
