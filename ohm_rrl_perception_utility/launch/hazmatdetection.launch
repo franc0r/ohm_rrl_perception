@@ -26,7 +26,7 @@
     <param name="settings_path"       value=""/>  <!-- Path to settings file (*.ini). -->
    </node>
    
-   <node name="hazmat_viz" pkg="ohm_rrl_perception_utility" type="hazmat_viz_node">
+   <node name="hazmat_viz" pkg="ohm_rrl_perception_utility" type="hazmat_viz_node" >
     <param name="input_topic" value="$(arg input_image_topic)"/>
     <param name="viz_topic"   value="$(arg img_haz_topic)"/>
    </node>

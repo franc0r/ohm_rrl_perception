@@ -9,9 +9,6 @@
 #define QRCODEDETECTION_H_
 
 #include "opencv2/opencv.hpp"
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <iostream>
 #include <zbar.h>
 #include <ros/ros.h>
 #include <ohm_perception_msgs/QrArray.h>
@@ -38,7 +35,7 @@ private:
 
   ohm_perception_msgs::QrArray _qrArray;
 
-  cv::Mat _frame;
+  cv::Mat            _frame;
   zbar::ImageScanner _scanner;
 };
 

@@ -93,6 +93,7 @@ void QrCodeDetection::imageCallBack(const sensor_msgs::ImageConstPtr& imageRos) 
 
       cv::putText(_frame, qr_text[i], qrCenter, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 256, 0), 1, 8, false);
       cv::line(_frame, imageCenter, cv::Point(_qrArray.qr.at(i).u, _qrArray.qr.at(i).v), cv::Scalar(256, 0, 256), 1);
+      ROS_INFO_STREAM("found qr: " << qr_text[i]);
     }
 
     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", _frame).toImageMsg();
