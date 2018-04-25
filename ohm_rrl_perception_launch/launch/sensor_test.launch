@@ -1,0 +1,21 @@
+<launch>
+
+  <include file="$(find ohm_rrl_motiondetection)/launch/motiondetection.launch" >
+      <arg name="input_image_topic" value="img_perception" />
+      <arg name="img_motion_topic"  value="img_motion" />
+  </include>  
+  
+  
+  <include file="$(find ohm_rrl_perception_utility)/launch/hazmatdetection.launch" >
+      <arg name="input_image_topic" value="img_perception" />
+      <arg name="img_haz_topic"     value="img_hazmats" />
+  </include>  
+  
+  
+  <include file="$(find ohm_rrl_qrdetection)/launch/qrdetection.launch" >
+      <arg name="input_image_topic" value="img_perception" />
+      <arg name="img_qr_topic"      value="img_qr" />
+  </include> 
+
+
+</launch>

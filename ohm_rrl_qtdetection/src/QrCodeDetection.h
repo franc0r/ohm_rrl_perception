@@ -13,7 +13,6 @@
 #include <ros/ros.h>
 #include <ohm_perception_msgs/QrArray.h>
 #include <image_transport/image_transport.h>
-#include <sensor_msgs/image_encodings.h>
 
 class QrCodeDetection {
 public:
