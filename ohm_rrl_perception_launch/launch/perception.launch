@@ -22,6 +22,15 @@
       <arg name="img_motion_topic"  value="img_motion" />
   </include>  
   
+  
+  <include file="$(find ohm_rrl_perception_utility)/launch/hazmatdetection.launch" >
+      <arg name="input_image_topic" value="img_perception" />
+      <arg name="img_haz_topic"     value="img_hazmats" />
+  </include>  
+  
+  
+  
+  
 
   <group if="$(arg with_viewer)">
     <node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />
