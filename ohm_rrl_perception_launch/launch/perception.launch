@@ -29,6 +29,12 @@
   </include>  
   
   
+  <include file="$(find ohm_rrl_qrdetection)/launch/qrdetection.launch" >
+      <arg name="input_image_topic" value="img_perception" />
+      <arg name="img_qr_topic"     value="img_qr" />
+  </include> 
+  
+  
   
   
 

@@ -12,9 +12,7 @@
 #include <zbar.h>
 #include <ros/ros.h>
 #include <ohm_perception_msgs/QrArray.h>
-#include <ohm_perception_msgs/Qr.h>
 #include <image_transport/image_transport.h>
-#include <cv_bridge/cv_bridge.h>
 #include <sensor_msgs/image_encodings.h>
 
 class QrCodeDetection {

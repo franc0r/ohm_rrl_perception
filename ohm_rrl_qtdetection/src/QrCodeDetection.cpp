@@ -6,8 +6,11 @@
  */
 
 #include "QrCodeDetection.h"
+#include <cv_bridge/cv_bridge.h>
+//#include <sensor_msgs/image_encodings.h>
 
 namespace enc = sensor_msgs::image_encodings;
+
 
 
 QrCodeDetection::QrCodeDetection(void) :
@@ -69,9 +72,9 @@ void QrCodeDetection::imageCallBack(const sensor_msgs::ImageConstPtr& imageRos) 
       qrCenter = (corners[0] + corners[2]) * 0.5;
 
       ohm_perception_msgs::Qr qr;
-      qr.id = ohm_perception_msgs::Qr::NONE;
-      qr.u = qrCenter.x;
-      qr.v = qrCenter.y;
+      qr.id   = ohm_perception_msgs::Qr::NONE;
+      qr.u    = qrCenter.x;
+      qr.v    = qrCenter.y;
       qr.data = symbol->get_data();
       _qrArray.qr.push_back(qr);
 
