@@ -1,16 +1,16 @@
 <launch>
 
   <!-- topics to multiplex -->
-  <arg name="driver_camera_topic" default="driver_cam"/>
+  <arg name="driver_camera_topic" default="/usb_cam/image_raw"/>
   <arg name="manip_camera_topic"  default="/gripper/color/image_raw"/>
 
 
 
-  <node pkg="topic_tools" type="mux" name="mux_perception_img" args="img_selected $(arg driver_camera_topic) $(arg manip_camera_topic)">
-    <!--remap from="mux/selected" to="img_perception"/-->
+  <node pkg="topic_tools" type="mux" name="mux_perception_img" args="img_selected $(arg manip_camera_topic)  $(arg driver_camera_topic)">
+    <remap from="img_selected"  to="img_perception"/>
   </node>
 
-
+  <param name="/motiondetection/show_cluster_circles" value="true"/>
   <include file="$(find ohm_rrl_motiondetection)/launch/motiondetection.launch" >
       <arg name="input_image_topic" value="img_perception" />
       <arg name="img_motion_topic"  value="img_motion" />

@@ -64,7 +64,6 @@ MotionDetectionNode::MotionDetectionNode(void)
 
   _img_sub        = _it.subscribe(image_topic,        1, &MotionDetectionNode::callbackImage, this);
   _img_pub        = _it.advertise(motion_image_topic, 1);
-//  _notify_pub     = _nh.advertise<ohm_perception_msgs::Rect>(rect_topic, 1);
 
 
   _bg = cv::createBackgroundSubtractorMOG2(); // new cv::BackgroundSubtractorMOG2(_frames, _threshold, true);
@@ -74,8 +73,7 @@ void MotionDetectionNode::callbackImage(const sensor_msgs::ImageConstPtr& img)
 {
 
   // do nothing if nobody subscribes to the node
-   if(_img_pub.getNumSubscribers() == 0)
-     return;
+   if(_img_pub.getNumSubscribers() == 0)  return;
 
    cv::Mat frame = this->calculateContours(img);
 
@@ -264,7 +262,8 @@ void MotionDetectionNode::calculateRectangles(cv::Mat frame)
         {
            rectangle(frame, cv::Point(minX, minY), cv::Point(maxX, maxY), centroid_color[i]);
 
-           if (maxX > minX && maxY > minY) {
+           if (maxX > minX && maxY > minY)
+           {
               // smooth rect
 
             /*  _rect.u      = minX;

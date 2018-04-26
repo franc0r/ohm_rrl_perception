@@ -11,8 +11,13 @@
 #include "opencv2/opencv.hpp"
 #include <zbar.h>
 #include <ros/ros.h>
-#include <ohm_perception_msgs/QrArray.h>
 #include <image_transport/image_transport.h>
+
+struct QrCode
+{
+  std::string label;
+  std::vector<cv::Point> corners;
+};
 
 class QrCodeDetection {
 public:
@@ -30,7 +35,9 @@ private:
   image_transport::Publisher  _imagePub;
   image_transport::Subscriber _imageSubs;
 
-  ohm_perception_msgs::QrArray _qrArray;
+//  ohm_perception_msgs::QrArray _qrArray;
+
+  std::vector<QrCode> _qrs;
 
   cv::Mat            _frame;
   zbar::ImageScanner _scanner;
