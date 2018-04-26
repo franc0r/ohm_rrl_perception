@@ -35,22 +35,13 @@ struct Hazmat
 };
 
 
-
 std::vector<Hazmat> _detected_haz;
 
-//cv::Point toCvPoint(const QPointF qt_p)
-//{
-//  cv::Point cv_p;
-//  cv_p.x = qt_p.x();
-//  cv_p.y = qt_p.y();
-//
-//
-//  return cv_p;
-//
-//}
 
 void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
 {
+  if(_img_pub.getNumSubscribers() == 0) return;
+
   _detected_haz.clear();
 
    if (msg.data.size())
@@ -65,70 +56,52 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
 
          std::cout << "detected: " << _label[id] << std::endl;
 
-//
-//         cv::Mat homography(3,3, CV_32F);
-//         for(unsigned int j=0; j<9 ; ++j)
-//         {
-//           homography.at<double>(::floor(j/3.0),j%3) = msg.data[i + 3+j];
-//         }
-//
-//
-//         std::vector<cv::Point2f> obj_corners;
-//         obj_corners.push_back(cv::Point2f(0,0));
-//         obj_corners.push_back(cv::Point2f(objectWidth, 0));
-//         obj_corners.push_back(cv::Point2f(0, objectHeight));
-//         obj_corners.push_back(cv::Point2f(objectWidth, objectHeight));
-//
-//         std::cout << "1" << std::endl;
-//
-//
-//         std::vector<cv::Point2f> scene_corners(4);
-//         cv::perspectiveTransform( obj_corners, scene_corners, homography);
-//
-//
-//
-//         std::cout << "2" << std::endl;
-//
-//
-         // Find corners Qt
-//         const QTransform qtHomography(msg.data[i + 3], msg.data[i + 4],
-//               msg.data[i + 5], msg.data[i + 6], msg.data[i + 7],
-//               msg.data[i + 8], msg.data[i + 9], msg.data[i + 10],
-//               msg.data[i + 11]);
+         cv::Mat homography(3,3, CV_64F);
+
+         for(unsigned int j=0; j<homography.cols*homography.rows ; ++j)
+         {
+           const unsigned int u = ::floor(j/3.0);
+           const unsigned int v = j%3;
+           homography.at<float>(j) = msg.data[i + 3+j];
+//           std::cout << j << " " << homography.at<float>(/*loor(j/3.0),j%3*/ j) << std::endl; //msg.data[i + 3+j];
+         }
 
 
-         cv::Point p(msg.data[i + 9], msg.data[i + 10]);
+         std::vector<cv::Point2f> obj_corners;
+         obj_corners.push_back(cv::Point2f(0,0));
+         obj_corners.push_back(cv::Point2f(objectWidth, 0));
+         obj_corners.push_back(cv::Point2f(0, objectHeight));
+         obj_corners.push_back(cv::Point2f(objectWidth, objectHeight));
 
-//         qDebug() << qtHomography;
-//
-//         const QPointF qtTopLeft     = qtHomography.map(QPointF(0, 0));
-//         const QPointF qtTopRight    = qtHomography.map(QPointF(objectWidth, 0));
-//         const QPointF qtBottomLeft  = qtHomography.map(QPointF(0, objectHeight));
-//         const QPointF qtBottomRight = qtHomography.map(QPointF(objectWidth, objectHeight));
-//
+
+
+//         for(unsigned int k=0 ; k<obj_corners.size() ; ++k)
+//           std::cout << "k: " << obj_corners[k] << std::endl;
+
+
+         std::vector<cv::Point2f> scene_corners(4);
+
+         if(obj_corners.size() != scene_corners.size())
+           ROS_ERROR("Missmatch");
+
+         cv::perspectiveTransform( obj_corners, scene_corners, homography);
+
+         const cv::Point p(msg.data[i + 9], msg.data[i + 10]);
 
          Hazmat h;
          h.label = _label[id];
 
-//         std::cout << "22" << std::endl;
-//         h.corners.push_back(toCvPoint(qtTopLeft));
-//         h.corners.push_back(toCvPoint(qtTopRight));
-//         h.corners.push_back(toCvPoint(qtBottomRight));
-//         h.corners.push_back(toCvPoint(qtBottomLeft));
-//         h.corners.push_back(cv::Point(scene_corners[0]));
-//         h.corners.push_back(cv::Point(scene_corners[1]));
-//         h.corners.push_back(cv::Point(scene_corners[2]));
-//         h.corners.push_back(cv::Point(scene_corners[3]));
-//         std::cout << "3" << std::endl;
-         h.corners.push_back(cv::Point(0,0));
-         h.corners.push_back(cv::Point(0,0));
-         h.corners.push_back(cv::Point(0,0));
-         h.corners.push_back(cv::Point(0,0));
+//         for(unsigned int k=0 ; k<scene_corners.size() ; ++k)
+//           std::cout << "k: " << scene_corners[k] << std::endl;
+
+         h.corners.push_back(cv::Point(scene_corners[0]));
+         h.corners.push_back(cv::Point(scene_corners[1]));
+         h.corners.push_back(cv::Point(scene_corners[2]));
+         h.corners.push_back(cv::Point(scene_corners[3]));
 
          h.one_corner = p;
          _detected_haz.push_back(h);
 
-//         std::cout << "3" << std::endl;
 
          }
       }
@@ -152,11 +125,18 @@ void imgCallback(const sensor_msgs::ImageConstPtr& img)
 
    cv::Mat     frame(cv_ptr->image);
 
+
+//   cv::Mat H = cv::getPerspectiveTransform(frame, frame);
+
+
+//   std::cout << H.cols << " " << H.rows << H.type() << std::endl;
+
    for(size_t i=0 ; i<_detected_haz.size() ; ++i)
    {
      for(unsigned int j=0 ; j<4 ; ++j) {
+//       std::cout << "corner at:" << _detected_haz[i].corners[(j+1)%4] << std::endl;
 //       cv::line(frame, _detected_haz[i].corners[j], _detected_haz[i].corners[(j+1)%4], cv::Scalar(0, 0, 255), 3);
-       cv::circle(frame, _detected_haz[i].one_corner, 50, cv::Scalar(255,0,0), 3);
+       cv::circle(frame, _detected_haz[i].one_corner, 80, cv::Scalar(255,0,0), 3);
 //       cv::putText(frame, _detected_haz[i].label, _detected_haz[i].corners[0], cv::FONT_HERSHEY_COMPLEX_SMALL,
 //                 0.8, cvScalar(200,200,250), 1, CV_AA);
        cv::putText(frame, _detected_haz[i].label, cv::Point(20, (i+1)*20), cv::FONT_HERSHEY_COMPLEX_SMALL,
