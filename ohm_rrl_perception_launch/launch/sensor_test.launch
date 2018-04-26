@@ -10,7 +10,7 @@
     <remap from="img_selected"  to="img_perception"/>
   </node>
 
-
+  <param name="/motiondetection/show_cluster_circles" value="true"/>
   <include file="$(find ohm_rrl_motiondetection)/launch/motiondetection.launch" >
       <arg name="input_image_topic" value="img_perception" />
       <arg name="img_motion_topic"  value="img_motion" />

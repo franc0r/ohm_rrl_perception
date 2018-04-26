@@ -25,7 +25,7 @@ QrCodeDetection::QrCodeDetection(void) :
   prvNh.param("cam_publisher_topic",  camPubTopic, std::string("image/qr_detection_left"));
   prvNh.param("cam_subscriber_topic", camSubTopic, std::string("/image_raw"));
 
-  _qrPub     = _nh.advertise<ohm_perception_msgs::QrArray>(qrTopic, 2);
+//  _qrPub     = _nh.advertise<ohm_perception_msgs::QrArray>(qrTopic, 2);
   _imageSubs = _it.subscribe(camSubTopic, 1, &QrCodeDetection::imageCallBack, this);
   _imagePub  = _it.advertise(camPubTopic, 2);
 
@@ -54,50 +54,58 @@ void QrCodeDetection::imageCallBack(const sensor_msgs::ImageConstPtr& imageRos) 
     zbar::Image image(grey.cols, grey.rows, "Y800", grey.data, grey.cols * grey.rows);
     const int n = _scanner.scan(image);
 
-    std::vector<std::string> qr_text;
 
+
+    _qrs.clear();
     //create the QrArray
-    _qrArray.qr.clear();
-    for (zbar::Image::SymbolIterator symbol = image.symbol_begin(); symbol != image.symbol_end(); ++symbol) {
-      std::vector<cv::Point> corners;
+    for (zbar::Image::SymbolIterator symbol = image.symbol_begin(); symbol != image.symbol_end(); ++symbol)
+    {
+      QrCode q;
       for (unsigned int i = 0; i < symbol->get_location_size(); i++)
-        corners.push_back(cv::Point(symbol->get_location_x(i), symbol->get_location_y(i)));
-
-      const cv::RotatedRect rotRect = minAreaRect(corners);
-      for (unsigned int i = 0; i < 4; i++) {
-        cv::line(_frame, corners[i], corners[(i + 1) % 4], cv::Scalar(0, 0, 255), 3);
+      {
+        q.label = symbol->get_data();
+        q.corners.push_back(cv::Point(symbol->get_location_x(i), symbol->get_location_y(i)));
       }
 
-      cv::Point qrCenter;
-      qrCenter = (corners[0] + corners[2]) * 0.5;
+      _qrs.push_back(q);
 
-      ohm_perception_msgs::Qr qr;
-      qr.id   = ohm_perception_msgs::Qr::NONE;
-      qr.u    = qrCenter.x;
-      qr.v    = qrCenter.y;
-      qr.data = symbol->get_data();
-      _qrArray.qr.push_back(qr);
+      const cv::RotatedRect rotRect = minAreaRect(q.corners);
+      for (unsigned int i = 0; i < 4; i++)
+      {
+        cv::line(_frame, q.corners[i], q.corners[(i + 1) % 4], cv::Scalar(0, 0, 255), 3);
+      }
 
-      qr_text.push_back(symbol->get_data());
+//      cv::Point qrCenter;
+//      qrCenter = (corners[0] + corners[2]) * 0.5;
+
+//      ohm_perception_msgs::Qr qr;
+//      qr.id   = ohm_perception_msgs::Qr::NONE;
+//      qr.u    = qrCenter.x;
+//      qr.v    = qrCenter.y;
+//      qr.data = symbol->get_data();
+//      _qrArray.qr.push_back(qr);
+
+//      qr_text.push_back(symbol->get_data());
     }
 
     // clean up
     image.set_data(NULL, 0);
 
     //publish QrArray and the image
-    if (_qrArray.qr.size()) _qrPub.publish(_qrArray);
 
     const cv::Point imageCenter(320, 240);
-    for (unsigned int i = 0; i < _qrArray.qr.size(); i++)
+    for (unsigned int i = 0; i < _qrs.size(); ++i)
     {
-      cv::Point qrCenter;
-      qrCenter.x = _qrArray.qr.at(i).u - 20;
-      qrCenter.y = _qrArray.qr.at(i).v + 10;
+      const cv::Point text_pos = _qrs[i].corners.front();
 
-      cv::putText(_frame, qr_text[i], qrCenter, cv::FONT_HERSHEY_SIMPLEX,
-          1.2, cvScalar(0,255,0), 2, CV_AA);
+
+      ROS_INFO_STREAM("text_pos" << text_pos);
+//      qrCenter.x = _qrArray.qr.at(i).u - 20;
+//      qrCenter.y = _qrArray.qr.at(i).v + 10;
+
+      cv::putText(_frame, _qrs[i].label, text_pos, cv::FONT_HERSHEY_SIMPLEX,           1.2, cvScalar(0,255,0), 2, CV_AA);
       //cv::line(_frame, imageCenter, cv::Point(_qrArray.qr.at(i).u, _qrArray.qr.at(i).v), cv::Scalar(0, 255, 0), 3);
-      std::cout << "found qr: " << qr_text[i] << std::endl;
+      std::cout << "found qr: " << _qrs[i].label << std::endl;
     }
 
     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", _frame).toImageMsg();
