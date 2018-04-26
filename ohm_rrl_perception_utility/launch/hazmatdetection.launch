@@ -13,7 +13,7 @@
        <param name="camera_frame_id" value="driver_cam" />
        <param name="pixel_format"    value="yuyv"       />
        
-       <remap from="/usb_cam/image_raw" to="$(arg image_topic)"/>
+       <remap from="/usb_cam/image_raw" to="$(arg input_image_topic)"/>
      </node>
    </group>
    
@@ -22,8 +22,8 @@
     <remap from="/image"              to="$(arg input_image_topic)"/>
     <param name="gui"                 value="$(arg with_viewer)"/>
     <param name="subscribe_depth"     value="false"/>
-    <param name="objects_path"        value="$(find ohm_rrl_perception_utility)/config/hazmats"/>  <!-- Path to folder containing objects to detect. -->
-    <param name="settings_path"       value=""/>  <!-- Path to settings file (*.ini). -->
+    <param name="objects_path"        value="$(find ohm_rrl_perception_utility)/config/hazmats"/>               <!-- Path to folder containing objects to detect. -->
+    <param name="settings_path"       value="$(find ohm_rrl_perception_utility)/config/hazmats/settings.ini"/>  <!-- Path to settings file (*.ini). -->
    </node>
    
    <node name="hazmat_viz" pkg="ohm_rrl_perception_utility" type="hazmat_viz_node" >

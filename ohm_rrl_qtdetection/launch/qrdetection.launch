@@ -18,7 +18,7 @@
 
 
 
-	<node pkg="ohm_rrl_qrdetection" type="ohm_rrl_qrdetection_node" name="qr_detection_node" output="screen">
+	<node pkg="ohm_rrl_qrdetection" type="ohm_rrl_qrdetection_node" name="qr_detection_node">
 		<param name="qr_topic"                  type="string" value="qr "/>
 		<param name="cam_subscriber_topic"   	  type="string" value="$(arg input_image_topic)"/>
 		<param name="cam_publisher_topic"       type="string" value="$(arg img_qr_topic)"/>

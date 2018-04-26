@@ -16,7 +16,6 @@ int main(int argc, char** argv)
   QrCodeDetection qrCodeDetection;
 
   ros::spin();
-//  qrCodeDetection.run();
 
   return 0;
 }

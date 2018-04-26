@@ -65,7 +65,7 @@ void QrCodeDetection::imageCallBack(const sensor_msgs::ImageConstPtr& imageRos) 
 
       const cv::RotatedRect rotRect = minAreaRect(corners);
       for (unsigned int i = 0; i < 4; i++) {
-        cv::line(_frame, corners[i], corners[(i + 1) % 4], cv::Scalar(255, 0, 0), 2);
+        cv::line(_frame, corners[i], corners[(i + 1) % 4], cv::Scalar(0, 0, 255), 3);
       }
 
       cv::Point qrCenter;
@@ -94,9 +94,10 @@ void QrCodeDetection::imageCallBack(const sensor_msgs::ImageConstPtr& imageRos) 
       qrCenter.x = _qrArray.qr.at(i).u - 20;
       qrCenter.y = _qrArray.qr.at(i).v + 10;
 
-      cv::putText(_frame, qr_text[i], qrCenter, cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 256, 0), 1, 8, false);
-      cv::line(_frame, imageCenter, cv::Point(_qrArray.qr.at(i).u, _qrArray.qr.at(i).v), cv::Scalar(256, 0, 256), 1);
-      ROS_INFO_STREAM("found qr: " << qr_text[i]);
+      cv::putText(_frame, qr_text[i], qrCenter, cv::FONT_HERSHEY_SIMPLEX,
+          1.2, cvScalar(0,255,0), 2, CV_AA);
+      //cv::line(_frame, imageCenter, cv::Point(_qrArray.qr.at(i).u, _qrArray.qr.at(i).v), cv::Scalar(0, 255, 0), 3);
+      std::cout << "found qr: " << qr_text[i] << std::endl;
     }
 
     sensor_msgs::ImagePtr msg = cv_bridge::CvImage(std_msgs::Header(), "bgr8", _frame).toImageMsg();
