@@ -139,7 +139,7 @@ add_dependencies(ohm_rrl_qrdetection_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${
 #add_dependencies(ohm_qr_stack_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ohm_rrl_qrdetection_node ${catkin_LIBRARIES}  ${OpenCV_LIBS} zbar)
+#target_link_libraries(ohm_rrl_qrdetection_node ${catkin_LIBRARIES}  ${OpenCV_LIBS} zbar)
 #target_link_libraries(ohm_qr_to_world_node ${catkin_LIBRARIES})
 #target_link_libraries(ohm_qr_stack_node ${catkin_LIBRARIES})
 
