@@ -126,8 +126,7 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
 void imgCallback(const sensor_msgs::ImageConstPtr& img)
 {
   // do nothing if nobody subscribes to the node
-   if(_img_pub.getNumSubscribers() == 0)
-     return;
+   if(_img_pub.getNumSubscribers() == 0) return;
 
    /*
     * convert image to opencv
