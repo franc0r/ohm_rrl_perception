@@ -5,18 +5,7 @@
    
    <arg name="input_image_topic" default="image_raw"/>
    <arg name="img_haz_topic"     default="img_hazmats"/>
-   
-   
-   <group if="$(arg with_camera)">
-     <node pkg="usb_cam" type="usb_cam_node" name="usb_cam">
-       <param name="camera_name"     value="driver_cam" />
-       <param name="camera_frame_id" value="driver_cam" />
-       <param name="pixel_format"    value="yuyv"       />
-       
-       <remap from="/usb_cam/image_raw" to="$(arg input_image_topic)"/>
-     </node>
-   </group>
-   
+
    
    <node name="hazmat_detection" pkg="find_object_2d" type="find_object_2d">
     <remap from="/image"              to="$(arg input_image_topic)"/>
@@ -26,7 +15,7 @@
     <param name="settings_path"       value="$(find ohm_rrl_perception_utility)/config/hazmats/settings.ini"/>  <!-- Path to settings file (*.ini). -->
    </node>
    
-   <node name="hazmat_viz" pkg="ohm_rrl_perception_utility" type="hazmat_viz_node" >
+   <node name="hazmat_viz" pkg="ohm_rrl_perception_utility" type="hazmat_viz_node" output="screen">
     <param name="input_topic" value="$(arg input_image_topic)"/>
     <param name="viz_topic"   value="$(arg img_haz_topic)"/>
    </node>

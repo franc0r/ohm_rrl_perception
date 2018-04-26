@@ -65,16 +65,15 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
          std::cout << "detected: " << _label[id] << std::endl;
 
          // Find corners Qt
-         QTransform qtHomography(msg.data[i + 3], msg.data[i + 4],
+         const QTransform qtHomography(msg.data[i + 3], msg.data[i + 4],
                msg.data[i + 5], msg.data[i + 6], msg.data[i + 7],
                msg.data[i + 8], msg.data[i + 9], msg.data[i + 10],
                msg.data[i + 11]);
 
-         QPointF qtTopLeft     = qtHomography.map(QPointF(0, 0));
-         QPointF qtTopRight    = qtHomography.map(QPointF(objectWidth, 0));
-         QPointF qtBottomLeft  = qtHomography.map(QPointF(0, objectHeight));
-         QPointF qtBottomRight = qtHomography.map(
-         QPointF(objectWidth, objectHeight));
+         const QPointF qtTopLeft     = qtHomography.map(QPointF(0, 0));
+         const QPointF qtTopRight    = qtHomography.map(QPointF(objectWidth, 0));
+         const QPointF qtBottomLeft  = qtHomography.map(QPointF(0, objectHeight));
+         const QPointF qtBottomRight = qtHomography.map(QPointF(objectWidth, objectHeight));
 
 
          Hazmat h;
@@ -85,14 +84,6 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
          h.corners.push_back(toCvPoint(qtBottomLeft));
          _detected_haz.push_back(h);
 
-
-//         ohm_perception_msgs::Marker rect;
-//         rect.top_left.x     = qtTopLeft.x();       rect.top_left.y     = qtTopLeft.y();
-//         rect.top_right.x    = qtTopRight.x();      rect.top_right.y    = qtTopRight.y();
-//         rect.bottom_left.x  = qtBottomLeft.x();    rect.bottom_left.y  = qtBottomLeft.y();
-//         rect.bottom_right.x = qtBottomRight.x();   rect.bottom_right.y = qtBottomRight.y();
-//
-//         marker_pub.publish(rect);
          }
       }
 }
@@ -116,17 +107,15 @@ void imgCallback(const sensor_msgs::ImageConstPtr& img)
 
    cv::Mat     frame(cv_ptr->image);
 
-
    for(size_t i=0 ; i<_detected_haz.size() ; ++i)
    {
-     for(unsigned int j=0 ; j<4 ; ++j)
+     for(unsigned int j=0 ; j<4 ; ++j) {
        cv::line(frame, _detected_haz[i].corners[j], _detected_haz[i].corners[(j+1)%4], cv::Scalar(0, 0, 255), 3);
-
-     cv::putText(frame,
-                 _detected_haz[i].label,
-                 _detected_haz[i].corners[0],
-                 cv::FONT_HERSHEY_COMPLEX_SMALL,
+       cv::putText(frame, _detected_haz[i].label, _detected_haz[i].corners[0], cv::FONT_HERSHEY_COMPLEX_SMALL,
                  0.8, cvScalar(200,200,250), 1, CV_AA);
+       cv::putText(frame, _detected_haz[i].label, cv::Point(20, (i+1)*20), cv::FONT_HERSHEY_COMPLEX_SMALL,
+                 0.8, cvScalar(200,200,250), 1, CV_AA);
+     }
    }
 
 
@@ -159,8 +148,6 @@ int main(int argc, char** argv)
 
    private_nh.param("input_topic",   input_topic,       std::string("image_raw"));
    private_nh.param("viz_topic",     output_topic,      std::string("img_hazmats"));
-
-
 
    subs = nh.subscribe("objects", 1, objectsDetectedCallback);
 

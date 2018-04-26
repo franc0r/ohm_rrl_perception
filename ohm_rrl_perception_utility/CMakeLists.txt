@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   image_transport
   roscpp
   std_msgs
-  image_transport
   cv_bridge
 )
 

@@ -38,22 +38,24 @@ QrCodeDetection::~QrCodeDetection() {
 void QrCodeDetection::imageCallBack(const sensor_msgs::ImageConstPtr& imageRos) {
   cv_bridge::CvImagePtr cv_ptr;
 
-  try {
+  try
+  {
     cv_ptr = cv_bridge::toCvCopy(imageRos, enc::BGR8);
-  } catch (cv_bridge::Exception& e) {
+  } catch (cv_bridge::Exception& e)
+  {
     ROS_ERROR("cv_bridge exception: %s", e.what());
   }
 
   _frame = cv_ptr->image;
 
-  if (_imagePub.getNumSubscribers() > 0) {
+  if (_imagePub.getNumSubscribers() > 0)
+  {
 
     cv::Mat grey;
     cv::cvtColor(_frame, grey, CV_BGR2GRAY);
 
     zbar::Image image(grey.cols, grey.rows, "Y800", grey.data, grey.cols * grey.rows);
     const int n = _scanner.scan(image);
-
 
 
     _qrs.clear();
@@ -75,33 +77,17 @@ void QrCodeDetection::imageCallBack(const sensor_msgs::ImageConstPtr& imageRos) 
         cv::line(_frame, q.corners[i], q.corners[(i + 1) % 4], cv::Scalar(0, 0, 255), 3);
       }
 
-//      cv::Point qrCenter;
-//      qrCenter = (corners[0] + corners[2]) * 0.5;
-
-//      ohm_perception_msgs::Qr qr;
-//      qr.id   = ohm_perception_msgs::Qr::NONE;
-//      qr.u    = qrCenter.x;
-//      qr.v    = qrCenter.y;
-//      qr.data = symbol->get_data();
-//      _qrArray.qr.push_back(qr);
-
-//      qr_text.push_back(symbol->get_data());
     }
 
     // clean up
     image.set_data(NULL, 0);
-
-    //publish QrArray and the image
 
     const cv::Point imageCenter(320, 240);
     for (unsigned int i = 0; i < _qrs.size(); ++i)
     {
       const cv::Point text_pos = _qrs[i].corners.front();
 
-
       ROS_INFO_STREAM("text_pos" << text_pos);
-//      qrCenter.x = _qrArray.qr.at(i).u - 20;
-//      qrCenter.y = _qrArray.qr.at(i).v + 10;
 
       cv::putText(_frame, _qrs[i].label, text_pos, cv::FONT_HERSHEY_SIMPLEX,           1.2, cvScalar(0,255,0), 2, CV_AA);
       //cv::line(_frame, imageCenter, cv::Point(_qrArray.qr.at(i).u, _qrArray.qr.at(i).v), cv::Scalar(0, 255, 0), 3);
