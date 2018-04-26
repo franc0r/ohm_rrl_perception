@@ -213,7 +213,7 @@ void MotionDetectionNode::calculateRectangles(cv::Mat frame)
         /*
          * skip small contours
          */
-        if (_contours[i].size() > 10)
+        if (_contours[i].size() > _config.min_contour_size)
         {
            if(i>3) continue;
 
@@ -231,8 +231,10 @@ void MotionDetectionNode::calculateRectangles(cv::Mat frame)
            _centroid.x = centX;
            _centroid.y = centY;
 
-
+           std::cout << "Motion Detected" << std::endl;
            circle(frame, _centroid, 50, centroid_color[i], 2);
+           cv::putText(frame, "1st Motion Detected", cv::Point(20, (i+1)*20), cv::FONT_HERSHEY_COMPLEX_SMALL,
+                     0.8, cvScalar(200,200,250), 1, CV_AA);
         }
       }
    }

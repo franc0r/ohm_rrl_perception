@@ -15,6 +15,9 @@ find_package(catkin REQUIRED COMPONENTS
 )
 
 
+find_package(OpenCV 3 REQUIRED)
+
+
 if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
   find_package(Qt5Widgets REQUIRED)
 else()
@@ -162,6 +165,8 @@ add_executable(hazmat_viz_node src/ohm_convert_findObject2D_toRect.cpp)
  target_link_libraries(hazmat_viz_node
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES} 
+   ${OpenCV_LIBS}
+   
  )
 
 #############

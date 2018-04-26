@@ -64,6 +64,31 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
 
          std::cout << "detected: " << _label[id] << std::endl;
 
+//
+//         cv::Mat homography(3,3, CV_32F);
+//         for(unsigned int j=0; j<9 ; ++j)
+//         {
+//           homography.at<double>(::floor(j/3.0),j%3) = msg.data[i + 3+j];
+//         }
+//
+//
+//         std::vector<cv::Point2f> obj_corners;
+//         obj_corners.push_back(cv::Point2f(0,0));
+//         obj_corners.push_back(cv::Point2f(objectWidth, 0));
+//         obj_corners.push_back(cv::Point2f(0, objectHeight));
+//         obj_corners.push_back(cv::Point2f(objectWidth, objectHeight));
+//
+//         std::cout << "1" << std::endl;
+//
+//
+//         std::vector<cv::Point2f> scene_corners(4);
+//         cv::perspectiveTransform( obj_corners, scene_corners, homography);
+//
+//
+//
+//         std::cout << "2" << std::endl;
+//
+//
          // Find corners Qt
          const QTransform qtHomography(msg.data[i + 3], msg.data[i + 4],
                msg.data[i + 5], msg.data[i + 6], msg.data[i + 7],
@@ -78,11 +103,21 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
 
          Hazmat h;
          h.label = _label[id];
+
+//         std::cout << "22" << std::endl;
          h.corners.push_back(toCvPoint(qtTopLeft));
          h.corners.push_back(toCvPoint(qtTopRight));
          h.corners.push_back(toCvPoint(qtBottomRight));
          h.corners.push_back(toCvPoint(qtBottomLeft));
+//         h.corners.push_back(cv::Point(scene_corners[0]));
+//         h.corners.push_back(cv::Point(scene_corners[1]));
+//         h.corners.push_back(cv::Point(scene_corners[2]));
+//         h.corners.push_back(cv::Point(scene_corners[3]));
+//         std::cout << "3" << std::endl;
+
          _detected_haz.push_back(h);
+
+//         std::cout << "3" << std::endl;
 
          }
       }
