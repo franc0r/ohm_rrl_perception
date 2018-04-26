@@ -1,9 +1,9 @@
 
 #include <ros/ros.h>
-#include <std_msgs/Float32MultiArray.h>
 #include <opencv2/opencv.hpp>
-#include <QTransform>
-
+//#include <QTransform>
+//#include <QDebug>
+#include <std_msgs/Float32MultiArray.h>
 #include <cv_bridge/cv_bridge.h>
 namespace enc = sensor_msgs::image_encodings;
 
@@ -31,22 +31,23 @@ struct Hazmat
 {
   std::string label;
   std::vector<cv::Point> corners;
+  cv::Point one_corner;
 };
 
 
 
 std::vector<Hazmat> _detected_haz;
 
-cv::Point toCvPoint(const QPointF qt_p)
-{
-  cv::Point cv_p;
-  cv_p.x = qt_p.x();
-  cv_p.y = qt_p.y();
-
-
-  return cv_p;
-
-}
+//cv::Point toCvPoint(const QPointF qt_p)
+//{
+//  cv::Point cv_p;
+//  cv_p.x = qt_p.x();
+//  cv_p.y = qt_p.y();
+//
+//
+//  return cv_p;
+//
+//}
 
 void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
 {
@@ -90,31 +91,41 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
 //
 //
          // Find corners Qt
-         const QTransform qtHomography(msg.data[i + 3], msg.data[i + 4],
-               msg.data[i + 5], msg.data[i + 6], msg.data[i + 7],
-               msg.data[i + 8], msg.data[i + 9], msg.data[i + 10],
-               msg.data[i + 11]);
+//         const QTransform qtHomography(msg.data[i + 3], msg.data[i + 4],
+//               msg.data[i + 5], msg.data[i + 6], msg.data[i + 7],
+//               msg.data[i + 8], msg.data[i + 9], msg.data[i + 10],
+//               msg.data[i + 11]);
 
-         const QPointF qtTopLeft     = qtHomography.map(QPointF(0, 0));
-         const QPointF qtTopRight    = qtHomography.map(QPointF(objectWidth, 0));
-         const QPointF qtBottomLeft  = qtHomography.map(QPointF(0, objectHeight));
-         const QPointF qtBottomRight = qtHomography.map(QPointF(objectWidth, objectHeight));
 
+         cv::Point p(msg.data[i + 9], msg.data[i + 10]);
+
+//         qDebug() << qtHomography;
+//
+//         const QPointF qtTopLeft     = qtHomography.map(QPointF(0, 0));
+//         const QPointF qtTopRight    = qtHomography.map(QPointF(objectWidth, 0));
+//         const QPointF qtBottomLeft  = qtHomography.map(QPointF(0, objectHeight));
+//         const QPointF qtBottomRight = qtHomography.map(QPointF(objectWidth, objectHeight));
+//
 
          Hazmat h;
          h.label = _label[id];
 
 //         std::cout << "22" << std::endl;
-         h.corners.push_back(toCvPoint(qtTopLeft));
-         h.corners.push_back(toCvPoint(qtTopRight));
-         h.corners.push_back(toCvPoint(qtBottomRight));
-         h.corners.push_back(toCvPoint(qtBottomLeft));
+//         h.corners.push_back(toCvPoint(qtTopLeft));
+//         h.corners.push_back(toCvPoint(qtTopRight));
+//         h.corners.push_back(toCvPoint(qtBottomRight));
+//         h.corners.push_back(toCvPoint(qtBottomLeft));
 //         h.corners.push_back(cv::Point(scene_corners[0]));
 //         h.corners.push_back(cv::Point(scene_corners[1]));
 //         h.corners.push_back(cv::Point(scene_corners[2]));
 //         h.corners.push_back(cv::Point(scene_corners[3]));
 //         std::cout << "3" << std::endl;
+         h.corners.push_back(cv::Point(0,0));
+         h.corners.push_back(cv::Point(0,0));
+         h.corners.push_back(cv::Point(0,0));
+         h.corners.push_back(cv::Point(0,0));
 
+         h.one_corner = p;
          _detected_haz.push_back(h);
 
 //         std::cout << "3" << std::endl;
@@ -144,9 +155,10 @@ void imgCallback(const sensor_msgs::ImageConstPtr& img)
    for(size_t i=0 ; i<_detected_haz.size() ; ++i)
    {
      for(unsigned int j=0 ; j<4 ; ++j) {
-       cv::line(frame, _detected_haz[i].corners[j], _detected_haz[i].corners[(j+1)%4], cv::Scalar(0, 0, 255), 3);
-       cv::putText(frame, _detected_haz[i].label, _detected_haz[i].corners[0], cv::FONT_HERSHEY_COMPLEX_SMALL,
-                 0.8, cvScalar(200,200,250), 1, CV_AA);
+//       cv::line(frame, _detected_haz[i].corners[j], _detected_haz[i].corners[(j+1)%4], cv::Scalar(0, 0, 255), 3);
+       cv::circle(frame, _detected_haz[i].one_corner, 50, cv::Scalar(255,0,0), 3);
+//       cv::putText(frame, _detected_haz[i].label, _detected_haz[i].corners[0], cv::FONT_HERSHEY_COMPLEX_SMALL,
+//                 0.8, cvScalar(200,200,250), 1, CV_AA);
        cv::putText(frame, _detected_haz[i].label, cv::Point(20, (i+1)*20), cv::FONT_HERSHEY_COMPLEX_SMALL,
                  0.8, cvScalar(200,200,250), 1, CV_AA);
      }
