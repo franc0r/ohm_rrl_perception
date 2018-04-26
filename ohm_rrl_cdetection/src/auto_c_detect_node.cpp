@@ -38,25 +38,34 @@
 using namespace cv;
 using namespace std;
 
-Mat src_unten; Mat src_unten_gray;
-Mat src_links; Mat src_links_gray;
-Mat src_rechts; Mat src_rechts_gray;
-Mat src_oben; Mat src_oben_gray;
-Mat src_los; Mat src_los_gray;
-Mat src_lus; Mat src_lus_gray;
-Mat src_ros; Mat src_ros_gray;
-Mat src_rus; Mat src_rus_gray;
-Mat img; Mat img_gray;
+Mat src_unten;
+Mat src_unten_gray;
+Mat src_links;
+Mat src_links_gray;
+Mat src_rechts;
+Mat src_rechts_gray;
+Mat src_oben;
+Mat src_oben_gray;
+Mat src_los;
+Mat src_los_gray;
+Mat src_lus;
+Mat src_lus_gray;
+Mat src_ros;
+Mat src_ros_gray;
+Mat src_rus;
+Mat src_rus_gray;
+Mat img;
+Mat img_gray;
 int thresh = 100;
 int max_thresh = 255;
 
-
-bool u_min=false, o_min=false, r_min=false, l_min=false, ro_min=false, ru_min=false, lo_min=false, lu_min=false;
-bool u_mid=false, o_mid=false, r_mid=false, l_mid=false, ro_mid=false, ru_mid=false, lo_mid=false, lu_mid=false;
-double max_area=0;
-double min_area=10000;
+bool u_min = false, o_min = false, r_min = false, l_min = false, ro_min = false, ru_min = false, lo_min = false,
+    lu_min = false;
+bool u_mid = false, o_mid = false, r_mid = false, l_mid = false, ro_mid = false, ru_mid = false, lo_mid = false,
+    lu_mid = false;
+double max_area = 0;
+double min_area = 10000;
 double mid_area;
-
 
 namespace enc = sensor_msgs::image_encodings;
 
@@ -65,13 +74,13 @@ std::string path_to_template;
 vector<vector<Point> > g_detected_contours;
 
 image_transport::Publisher pubContours;
-image_transport::Publisher pubGray;
+//image_transport::Publisher pubGray;
 image_transport::Publisher pubDetected;
 
 RNG rng(12345);
 
 /// Function header
-void thresh_callback(int, void* );
+void thresh_callback(int, void*);
 
 cv::Mat _Input;
 cv::Mat _InputM;
@@ -81,115 +90,102 @@ cv_bridge::CvImagePtr frame;
 //callback Intel Realsense camera data
 void callCam(const sensor_msgs::ImageConstPtr& camImage)
 {
-  std::cout <<"callback " << std::endl;
+//  std::cout << "callback " << std::endl;
 
-//  cv_bridge::CvImagePtr frame;
-
-  try {
-       std::cout << "try " << std::endl;
-       std::cout << "encoding: " << camImage->encoding << std::endl;
-       frame = cv_bridge::toCvCopy(camImage, camImage->encoding);
-     }
-     catch (cv_bridge::Exception& e) {
-       ROS_ERROR("cv_bridge exception: %s", e.what());
+  try
+  {
+//    std::cout << "try " << std::endl;
+//    std::cout << "encoding: " << camImage->encoding << std::endl;
+    frame = cv_bridge::toCvCopy(camImage, camImage->encoding);
+  }
+  catch(cv_bridge::Exception& e)
+  {
+    ROS_ERROR("cv_bridge exception: %s", e.what());
   }
 
-  if((frame->image.rows == 0))//}&&(_InputM.rows==0)){
-         std::cout << "No data" << std::endl;
-  else
-    std::cout << "Data available" << std::endl;
+  if((frame->image.rows == 0))
+    std::cout << "No data" << std::endl;
+//  else
+//    std::cout << "Data available" << std::endl;
 
+  //Convert _Input to gray
 
+  //RGB Image
+  cvtColor(frame->image, img_gray, CV_RGB2GRAY);
+  blur(img_gray, img_gray, Size(3, 3));
 
-    //Convert _Input to gray
+  const unsigned int kernel_size = 1;
 
-
-    //RGB Image
-    cvtColor(frame->image,  img_gray, CV_RGB2GRAY);
-    blur( img_gray, img_gray, Size(3,3) );
-
-  //  equalizeHist( img_gray, img_gray );
-
-
-    const unsigned int kernel_size = 1;
-
-    /// Convert image to gray and blur it -> Graubild
-    cvtColor( src_unten, src_unten_gray, CV_BGR2GRAY );
-    blur( src_unten_gray, src_unten_gray, Size(kernel_size,kernel_size) );
-    /// Convert image to gray and blur it
-    cvtColor( src_links, src_links_gray, CV_BGR2GRAY );
-    blur( src_links_gray, src_links_gray, Size(kernel_size,kernel_size) );
-    /// Convert image to gray and blur it
+  /// Convert image to gray and blur it -> Graubild
+  cvtColor(src_unten, src_unten_gray, CV_BGR2GRAY);
+  blur(src_unten_gray, src_unten_gray, Size(kernel_size, kernel_size));
+  /// Convert image to gray and blur it
+  cvtColor(src_links, src_links_gray, CV_BGR2GRAY);
+  blur(src_links_gray, src_links_gray, Size(kernel_size, kernel_size));
+  /// Convert image to gray and blur it
   //  cvtColor( src_rechts, src_rechts_gray, CV_BGR2GRAY );
   //  blur( src_rechts_gray, src_rechts_gray, Size(3,3) );
-    /// Convert image to gray and blur it
-    cvtColor( src_oben, src_oben_gray, CV_BGR2GRAY );
-    blur( src_oben_gray, src_oben_gray, Size(kernel_size,kernel_size) );
-    /// Convert image to gray and blur it
-    cvtColor( src_los, src_los_gray, CV_BGR2GRAY );
-    blur( src_los_gray, src_los_gray, Size(kernel_size,kernel_size));
-    /// Convert image to gray and blur it
-    cvtColor( src_lus, src_lus_gray, CV_BGR2GRAY );
-    blur( src_lus_gray, src_lus_gray, Size(kernel_size,kernel_size) );
-    /// Convert image to gray and blur it
-    cvtColor( src_ros, src_ros_gray, CV_BGR2GRAY );
-    blur( src_ros_gray, src_ros_gray, Size(kernel_size,kernel_size) );
-    /// Convert image to gray and blur it
-    cvtColor( src_rus, src_rus_gray, CV_BGR2GRAY );
-    blur( src_rus_gray, src_rus_gray, Size(kernel_size,kernel_size) );
+  /// Convert image to gray and blur it
+  cvtColor(src_oben, src_oben_gray, CV_BGR2GRAY);
+  blur(src_oben_gray, src_oben_gray, Size(kernel_size, kernel_size));
+  /// Convert image to gray and blur it
+  cvtColor(src_los, src_los_gray, CV_BGR2GRAY);
+  blur(src_los_gray, src_los_gray, Size(kernel_size, kernel_size));
+  /// Convert image to gray and blur it
+  cvtColor(src_lus, src_lus_gray, CV_BGR2GRAY);
+  blur(src_lus_gray, src_lus_gray, Size(kernel_size, kernel_size));
+  /// Convert image to gray and blur it
+  cvtColor(src_ros, src_ros_gray, CV_BGR2GRAY);
+  blur(src_ros_gray, src_ros_gray, Size(kernel_size, kernel_size));
+  /// Convert image to gray and blur it
+  cvtColor(src_rus, src_rus_gray, CV_BGR2GRAY);
+  blur(src_rus_gray, src_rus_gray, Size(kernel_size, kernel_size));
 
-    thresh_callback( 0, 0 );
+  thresh_callback(0, 0);
 
-  };
-
+}
+;
 
 /** @function main */
-int main( int argc, char** argv )
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "camera");
   ros::NodeHandle nh;
   ros::NodeHandle private_nh("~");
 
-
   image_transport::ImageTransport it(nh);
   sensor_msgs::ImagePtr msg;
 
+  private_nh.param("path_to_template", path_to_template, std::string(""));
 
-
-
-  private_nh.param("path_to_template",         path_to_template,         std::string(""));
-
-
-
-  if(path_to_template.length() == 0) {
+  if(path_to_template.length() == 0)
+  {
     ROS_ERROR("path for templates not set. I will exit");
     exit(1);
   }
 
-
   //Subscriber Realsense D415
-  image_transport::Subscriber imgSub = it.subscribe("/gripper/color/image_raw",1, callCam);
-  pubGray     = it.advertise("/gripper/image_gray", 1);
+  image_transport::Subscriber imgSub = it.subscribe("/gripper/color/image_raw", 1, callCam);
+//  pubGray = it.advertise("/gripper/image_gray", 1);
   pubContours = it.advertise("/gripper/image_contours", 1);
-  pubDetected = it.advertise("/gripper/detected_contours", 1);
+//  pubDetected = it.advertise("/gripper/detected_contours", 1);
 
+  // Reference images
+  /// Load source image and convert it to gray - C unten
+  std::string img_path = path_to_template + "C_gross_unten.jpg";
+  src_unten = imread(img_path, 1);
+  if(!src_unten.data)                              // Check for invalid input
+  {
+    cout << "Could not open or find the image " << img_path << std::endl;
+  }
+  /// Load source image and convert it to gray - C links
+  img_path = path_to_template + "C_gross_links.jpg";
+  src_links = imread(img_path, 1);
 
-  // Reference imagesq
-    /// Load source image and convert it to gray - C unten
-      std::string img_path = path_to_template + "C_gross_unten.jpg";
-      src_unten = imread( img_path,  1 );
-      if(! src_unten.data )                              // Check for invalid input
-    {
-          cout <<  "Could not open or find the image " << img_path << std::endl ;
-    }
-      /// Load source image and convert it to gray - C links
-      img_path = path_to_template + "C_gross_links.jpg";
-      src_links = imread( img_path, 1 );
-
-      if(! src_links.data )                              // Check for invalid input
-      {
-          cout <<  "Could not open or find the image " << img_path << std::endl ;
-      }
+  if(!src_links.data)                              // Check for invalid input
+  {
+    cout << "Could not open or find the image " << img_path << std::endl;
+  }
   //   /// Load source image and convert it to gray - C rechts
   //    img_path = path_to_template + "C_gross_rechts.jpg";
   //    src_rechts = imread( img_path, 1 );
@@ -200,63 +196,57 @@ int main( int argc, char** argv )
   //      return -1;
   //    }
 
-        /// Load source image and convert it to gray - C oben
-      img_path = path_to_template + "C_gross_oben.jpg";
-      src_oben = imread( img_path, 1 );
+  /// Load source image and convert it to gray - C oben
+  img_path = path_to_template + "C_gross_oben.jpg";
+  src_oben = imread(img_path, 1);
 
-      if(! src_oben.data )                              // Check for invalid input
-      {
-          cout <<  "Could not open or find the image " << img_path << std::endl ;
-      }
+  if(!src_oben.data)                              // Check for invalid input
+  {
+    cout << "Could not open or find the image " << img_path << std::endl;
+  }
 
-        /// Load source image and convert it to gray - C oben links schraeg
-      img_path = path_to_template + "C_gross_links_oben.jpg";
-      src_los = imread(img_path, 1 );
+  /// Load source image and convert it to gray - C oben links schraeg
+  img_path = path_to_template + "C_gross_links_oben.jpg";
+  src_los = imread(img_path, 1);
 
-      if(! src_los.data )                              // Check for invalid input
-      {
-          cout <<  "Could not open or find the image " << img_path << std::endl ;
-      }
+  if(!src_los.data)                              // Check for invalid input
+  {
+    cout << "Could not open or find the image " << img_path << std::endl;
+  }
 
-      /// Load source image and convert it to gray - C links unten schraeg
-      img_path = path_to_template + "C_gross_links_unten.jpg";
-      src_lus = imread( img_path, 1 );
+  /// Load source image and convert it to gray - C links unten schraeg
+  img_path = path_to_template + "C_gross_links_unten.jpg";
+  src_lus = imread(img_path, 1);
 
-      if(! src_lus.data )                              // Check for invalid input
-      {
-        cout <<  "Could not open or find the image " << img_path << std::endl ;
-      }
+  if(!src_lus.data)                              // Check for invalid input
+  {
+    cout << "Could not open or find the image " << img_path << std::endl;
+  }
 
-      /// Load source image and convert it to gray - C rechts oben schraeg
-      img_path = path_to_template + "C_gross_rechts_oben.jpg";
-      src_ros = imread(img_path, 1 );
+  /// Load source image and convert it to gray - C rechts oben schraeg
+  img_path = path_to_template + "C_gross_rechts_oben.jpg";
+  src_ros = imread(img_path, 1);
 
-      if(! src_ros.data )                              // Check for invalid input
-      {
-          cout <<  "Could not open or find the image " << img_path << std::endl ;
-      }
+  if(!src_ros.data)                              // Check for invalid input
+  {
+    cout << "Could not open or find the image " << img_path << std::endl;
+  }
 
-      /// Load source image and convert it to gray - C rechts oben schraeg
-      img_path = path_to_template + "C_gross_rechts_unten.jpg";
-      src_rus = imread( img_path, 1 );
+  /// Load source image and convert it to gray - C rechts unten schraeg
+  img_path = path_to_template + "C_gross_rechts_unten.jpg";
+  src_rus = imread(img_path, 1);
 
-      if(! src_rus.data )                              // Check for invalid input
-      {
-          cout <<  "Could not open or find the image " << img_path << std::endl ;
-      }
+  if(!src_rus.data)                              // Check for invalid input
+  {
+    cout << "Could not open or find the image " << img_path << std::endl;
+  }
 
-
-
-  // Look for data
-//  ros::Rate r(10);
   ros::spin();
-
 
 }
 
-
 /** @function thresh_callback */
-void thresh_callback(int, void* )
+void thresh_callback(int, void*)
 {
   Mat canny_output;
 //  Mat canny_thermal;
@@ -281,146 +271,136 @@ void thresh_callback(int, void* )
   vector<vector<Point> > contours_rus_fixed;
   vector<Vec4i> hierarchy;
 
-
   //Edge detection and find contours
 
   //Reference image
   //  Detect edges using canny
-  Canny( src_unten_gray, canny_unten_fixed, thresh, thresh*2, 3 );
+  Canny(src_unten_gray, canny_unten_fixed, thresh, thresh * 2, 3);
   /// Find contours
-  findContours( canny_unten_fixed, contours_unten_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+  findContours(canny_unten_fixed, contours_unten_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-
-  Canny( src_links_gray, canny_links_fixed, thresh, thresh*2, 3 );
+  Canny(src_links_gray, canny_links_fixed, thresh, thresh * 2, 3);
   //  std::cout << "before find contours " << std::endl;
   // Find contours
-  findContours( canny_links_fixed, contours_links_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0) );
+  findContours(canny_links_fixed, contours_links_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
 //  Canny(src_rechts_gray, canny_rechts_fixed, thresh, thresh*2,3);
 //  findContours(canny_rechts_fixed, contours_rechts_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
 
-  Canny(src_oben_gray, canny_oben_fixed, thresh, thresh*2,3);
-  findContours(canny_oben_fixed, contours_oben_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+  Canny(src_oben_gray, canny_oben_fixed, thresh, thresh * 2, 3);
+  findContours(canny_oben_fixed, contours_oben_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-  Canny(src_los_gray, canny_los_fixed, thresh, thresh*2,3);
-  findContours(canny_los_fixed, contours_los_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+  Canny(src_los_gray, canny_los_fixed, thresh, thresh * 2, 3);
+  findContours(canny_los_fixed, contours_los_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-  Canny(src_lus_gray, canny_lus_fixed, thresh, thresh*2,3);
-  findContours(canny_lus_fixed, contours_lus_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+  Canny(src_lus_gray, canny_lus_fixed, thresh, thresh * 2, 3);
+  findContours(canny_lus_fixed, contours_lus_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-  Canny(src_ros_gray, canny_ros_fixed, thresh, thresh*2,3);
-  findContours(canny_ros_fixed, contours_ros_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+  Canny(src_ros_gray, canny_ros_fixed, thresh, thresh * 2, 3);
+  findContours(canny_ros_fixed, contours_ros_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-  Canny(src_rus_gray, canny_rus_fixed, thresh, thresh*2,3);
-  findContours(canny_rus_fixed, contours_rus_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
-
+  Canny(src_rus_gray, canny_rus_fixed, thresh, thresh * 2, 3);
+  findContours(canny_rus_fixed, contours_rus_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
   //RGB Image
-  Canny(img_gray, canny_output, thresh, thresh*2,3);
-  std::cout << canny_output.cols << std::endl;
-  findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
-
-
+  Canny(img_gray, canny_output, thresh, thresh * 2, 3);
+//  std::cout << canny_output.cols << std::endl;
+  findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
   /// Get the moments
   //Moments C unten
-  vector<Moments> mu_u(contours_unten_fixed.size() );
-  for( unsigned int i = 0; i < contours_unten_fixed.size(); i++ )
-     { mu_u[i] = cv::moments(contours_unten_fixed[i], false);
+  vector<Moments> mu_u(contours_unten_fixed.size());
+  for(unsigned int i = 0; i < contours_unten_fixed.size(); i++)
+  {
+    mu_u[i] = cv::moments(contours_unten_fixed[i], false);
 
-     }
-
-  //Moments C links
-  vector<Moments> mu_l(contours_links_fixed.size() );
-  for( unsigned int i = 0; i < contours_links_fixed.size(); i++ )
-     { mu_l[i] = cv::moments(contours_links_fixed[i], false);
-
-     }
+  }
 
   //Moments C links
-  vector<Moments> mu_r(contours_rechts_fixed.size() );
-  for( unsigned int i = 0; i < contours_rechts_fixed.size(); i++ )
-  { mu_r[i] = cv::moments(contours_rechts_fixed[i], false);
+  vector<Moments> mu_l(contours_links_fixed.size());
+  for(unsigned int i = 0; i < contours_links_fixed.size(); i++)
+  {
+    mu_l[i] = cv::moments(contours_links_fixed[i], false);
+
+  }
+
+  //Moments C links
+  vector<Moments> mu_r(contours_rechts_fixed.size());
+  for(unsigned int i = 0; i < contours_rechts_fixed.size(); i++)
+  {
+    mu_r[i] = cv::moments(contours_rechts_fixed[i], false);
 
   }
 
   //Moments C oben
-  vector<Moments> mu_o(contours_oben_fixed.size() );
-  for( unsigned int i = 0; i < contours_oben_fixed.size(); i++ )
-  { mu_o[i] = cv::moments(contours_oben_fixed[i], false);
+  vector<Moments> mu_o(contours_oben_fixed.size());
+  for(unsigned int i = 0; i < contours_oben_fixed.size(); i++)
+  {
+    mu_o[i] = cv::moments(contours_oben_fixed[i], false);
 
   }
 
   //Moments C links oben schraeg
-   vector<Moments> mu_los(contours_los_fixed.size() );
-   for( unsigned int i = 0; i < contours_los_fixed.size(); i++ )
-   { mu_los[i] = cv::moments(contours_los_fixed[i], false);
+  vector<Moments> mu_los(contours_los_fixed.size());
+  for(unsigned int i = 0; i < contours_los_fixed.size(); i++)
+  {
+    mu_los[i] = cv::moments(contours_los_fixed[i], false);
 
-   }
+  }
 
-   //Moments C links unten schraeg
-   vector<Moments> mu_lus(contours_lus_fixed.size() );
-   for( unsigned int i = 0; i < contours_lus_fixed.size(); i++ )
-   { mu_lus[i] = cv::moments(contours_lus_fixed[i], false);
+  //Moments C links unten schraeg
+  vector<Moments> mu_lus(contours_lus_fixed.size());
+  for(unsigned int i = 0; i < contours_lus_fixed.size(); i++)
+  {
+    mu_lus[i] = cv::moments(contours_lus_fixed[i], false);
 
-   }
+  }
 
-   //Moments C recht oben schraeg
-   vector<Moments> mu_ros(contours_ros_fixed.size() );
-   for( unsigned int i = 0; i < contours_ros_fixed.size(); i++ )
-   { mu_ros[i] = cv::moments(contours_ros_fixed[i], false);
+  //Moments C recht oben schraeg
+  vector<Moments> mu_ros(contours_ros_fixed.size());
+  for(unsigned int i = 0; i < contours_ros_fixed.size(); i++)
+  {
+    mu_ros[i] = cv::moments(contours_ros_fixed[i], false);
 
-   }
+  }
 
-   //Moments C recht oben schraeg
-   vector<Moments> mu_rus(contours_rus_fixed.size() );
-   for( unsigned int i = 0; i < contours_rus_fixed.size(); i++ )
-   { mu_rus[i] = cv::moments(contours_rus_fixed[i], false);
+  //Moments C recht oben schraeg
+  vector<Moments> mu_rus(contours_rus_fixed.size());
+  for(unsigned int i = 0; i < contours_rus_fixed.size(); i++)
+  {
+    mu_rus[i] = cv::moments(contours_rus_fixed[i], false);
 
-   }
-
+  }
 
   //Moments incoming image camera
-  vector<Moments> mu(contours.size() );
-  for( unsigned int i = 0; i < contours.size(); i++ )
-     { mu[i] = cv::moments(contours[i], false);
+  vector<Moments> mu(contours.size());
+  for(unsigned int i = 0; i < contours.size(); i++)
+  {
+    mu[i] = cv::moments(contours[i], false);
 
-     }
-
-
-
-
-
-//  for(unsigned int i=0; i<contours.size();i++)
-//    {
-//      std::cout << "Central moment 1 camera " << abs(mu[i].nu20) << std::endl;
-//      std::cout << "Central moment 2 camera " << abs(mu[i].nu11) << std::endl;
-//      std::cout << "Central moment 3 camera " << abs(mu[i].nu02) << std::endl;
-//      std::cout << "Central moment 4 camera " << abs(mu[i].nu30) << std::endl;
-//      std::cout << "Central moment 5 camera " << abs(mu[i].nu21) << std::endl;
-//      std::cout << "Central moment 6 camera " << abs(mu[i].nu12) << std::endl;
-//      std::cout << "Central moment 7 camera " << abs(mu[i].nu03) << std::endl;
-//
-//    }
+  }
 
 
   double area_u, area_l, area_r, area_o, area_lu, area_lo, area_ru, area_ro;
-  int x=0.0;
-  double num[3]= {0,0,0};
-  double nam[3]= {0,0,0};
-  bool u_max=false, o_max=false, r_max=false, l_max=false, ro_max=false, ru_max=false, lo_max=false, lu_max=false;
-
+  int x = 0.0;
+  double num[3] = {0, 0, 0};
+  double nam[3] = {0, 0, 0};
+  bool u_max = false, o_max = false, r_max = false, l_max = false, ro_max = false, ru_max = false, lo_max = false,
+      lu_max = false;
 
   constexpr double th_moment = 0.0;
   //C unten Detektion
 
   g_detected_contours.clear();
 
-  for(unsigned int i = 0; i<contours.size();i++)
+  for(unsigned int i = 0; i < contours.size(); i++)
   {
-    for(unsigned int j=0; j<contours_unten_fixed.size(); j++)
-//      if((abs(mu[i].nu20-mu_u[j].nu20)<0.0123) && (abs(mu[i].nu11-mu_u[j].nu11)<0.0123) && (abs(mu[i].nu02-mu_u[j].nu02)<0.0123) && (abs(mu[i].nu30-mu_u[j].nu30)<0.0123)&& (abs(mu[i].nu21-mu_u[j].nu21)<0.0123) && (abs(mu[i].nu12-mu_u[j].nu12)<0.0123) && (abs(mu[i].nu03-mu_u[j].nu03)<0.0123))
-       if((abs(mu[i].nu20-mu_u[j].nu20)<0.01) && (abs(mu[i].nu11-mu_u[j].nu11)<0.01) && (abs(mu[i].nu02-mu_u[j].nu02)<0.01) && (abs(mu[i].nu30-mu_u[j].nu30)<0.01)&& (abs(mu[i].nu21-mu_u[j].nu21)<0.01) && (abs(mu[i].nu12-mu_u[j].nu12)<0.01) && (abs(mu[i].nu03-mu_u[j].nu03)<0.01))
+    for(unsigned int j = 0; j < contours_unten_fixed.size(); j++)
+//      if((abs(mu[i].nu20-mu_u[j].nu20)<0.00723) && (abs(mu[i].nu11-mu_u[j].nu11)<0.00723) && (abs(mu[i].nu02-mu_u[j].nu02)<0.00723) && (abs(mu[i].nu30-mu_u[j].nu30)<0.00723)&& (abs(mu[i].nu21-mu_u[j].nu21)<0.00723) && (abs(mu[i].nu12-mu_u[j].nu12)<0.00723) && (abs(mu[i].nu03-mu_u[j].nu03)<0.00723))
+      if((abs(mu[i].nu20 - mu_u[j].nu20) < 0.007) && (abs(mu[i].nu11 - mu_u[j].nu11) < 0.007)
+          && (abs(mu[i].nu02 - mu_u[j].nu02) < 0.007) && (abs(mu[i].nu30 - mu_u[j].nu30) < 0.007)
+          && (abs(mu[i].nu21 - mu_u[j].nu21) < 0.007) && (abs(mu[i].nu12 - mu_u[j].nu12) < 0.007)
+          && (abs(mu[i].nu03 - mu_u[j].nu03) < 0.007))
 
       {
         std::cout << "C unten detected " << std::endl;
@@ -441,16 +421,15 @@ void thresh_callback(int, void* )
       }
   }
 
-
-
-
-
   //C links Detektion
-  for(unsigned int i = 0; i<contours.size();i++)
+  for(unsigned int i = 0; i < contours.size(); i++)
   {
-    for(unsigned int j=0; j<contours_links_fixed.size();j++)
-//      if((abs(mu[i].nu20-mu_l[j].nu20)<0.0123) && (abs(mu[i].nu11-mu_l[j].nu11)<0.0123) && (abs(mu[i].nu02-mu_l[j].nu02)<0.0123) && (abs(mu[i].nu30-mu_l[j].nu30)<0.0123) && (abs(mu[i].nu21-mu_l[j].nu21)<0.0123) && (abs(mu[i].nu12-mu_l[j].nu12)<0.0123) && (abs(mu[i].nu03-mu_l[j].nu03)<0.0123))
-        if((abs(mu[i].nu20-mu_l[j].nu20)<0.01) && (abs(mu[i].nu11-mu_l[j].nu11)<0.01) && (abs(mu[i].nu02-mu_l[j].nu02)<0.01) && (abs(mu[i].nu30-mu_l[j].nu30)<0.01) && (abs(mu[i].nu21-mu_l[j].nu21)<0.01) && (abs(mu[i].nu12-mu_l[j].nu12)<0.01) && (abs(mu[i].nu03-mu_l[j].nu03)<0.01))
+    for(unsigned int j = 0; j < contours_links_fixed.size(); j++)
+//      if((abs(mu[i].nu20-mu_l[j].nu20)<0.00723) && (abs(mu[i].nu11-mu_l[j].nu11)<0.00723) && (abs(mu[i].nu02-mu_l[j].nu02)<0.00723) && (abs(mu[i].nu30-mu_l[j].nu30)<0.00723) && (abs(mu[i].nu21-mu_l[j].nu21)<0.00723) && (abs(mu[i].nu12-mu_l[j].nu12)<0.00723) && (abs(mu[i].nu03-mu_l[j].nu03)<0.00723))
+      if((abs(mu[i].nu20 - mu_l[j].nu20) < 0.007) && (abs(mu[i].nu11 - mu_l[j].nu11) < 0.007)
+          && (abs(mu[i].nu02 - mu_l[j].nu02) < 0.007) && (abs(mu[i].nu30 - mu_l[j].nu30) < 0.007)
+          && (abs(mu[i].nu21 - mu_l[j].nu21) < 0.007) && (abs(mu[i].nu12 - mu_l[j].nu12) < 0.007)
+          && (abs(mu[i].nu03 - mu_l[j].nu03) < 0.007))
 
       {
         std::cout << "C links detected " << std::endl;
@@ -472,16 +451,14 @@ void thresh_callback(int, void* )
       }
   }
 
-//  return;
-
 
 
 //  //C rechts Detektion
 //  for(unsigned int i = 0; i<contours.size();i++)
 //  {
 //    for(unsigned int j=0; j<contours_links_fixed.size();j++)
-////      if((abs(mu[i].nu20-mu_r[j].nu20)<0.0123) && (abs(mu[i].nu11-mu_r[j].nu11)<0.0123) && (abs(mu[i].nu02-mu_r[j].nu02)<0.0123) && (abs(mu[i].nu30-mu_r[j].nu30)<0.0123) && (abs(mu[i].nu21-mu_r[j].nu21)<0.0123) && (abs(mu[i].nu12-mu_r[j].nu12)<0.0123) && (abs(mu[i].nu03-mu_r[j].nu03)<0.0123))
-//        if((abs(mu[i].nu20-mu_r[j].nu20)<0.01) && (abs(mu[i].nu11-mu_r[j].nu11)<0.01) && (abs(mu[i].nu02-mu_r[j].nu02)<0.01) && (abs(mu[i].nu30-mu_r[j].nu30)<0.01) && (abs(mu[i].nu21-mu_r[j].nu21)<0.01) && (abs(mu[i].nu12-mu_r[j].nu12)<0.01) && (abs(mu[i].nu03-mu_r[j].nu03)<0.01))
+////      if((abs(mu[i].nu20-mu_r[j].nu20)<0.00723) && (abs(mu[i].nu11-mu_r[j].nu11)<0.00723) && (abs(mu[i].nu02-mu_r[j].nu02)<0.00723) && (abs(mu[i].nu30-mu_r[j].nu30)<0.00723) && (abs(mu[i].nu21-mu_r[j].nu21)<0.00723) && (abs(mu[i].nu12-mu_r[j].nu12)<0.00723) && (abs(mu[i].nu03-mu_r[j].nu03)<0.00723))
+//        if((abs(mu[i].nu20-mu_r[j].nu20)<0.007) && (abs(mu[i].nu11-mu_r[j].nu11)<0.007) && (abs(mu[i].nu02-mu_r[j].nu02)<0.007) && (abs(mu[i].nu30-mu_r[j].nu30)<0.007) && (abs(mu[i].nu21-mu_r[j].nu21)<0.007) && (abs(mu[i].nu12-mu_r[j].nu12)<0.007) && (abs(mu[i].nu03-mu_r[j].nu03)<0.007))
 //      {
 //        std::cout << "C rechts detected " << std::endl;
 //        if(!r_max)
@@ -522,14 +499,15 @@ void thresh_callback(int, void* )
 //      }
 //  }
 
-
-
   //C oben Detektion
-  for(unsigned int i = 0; i<contours.size();i++)
+  for(unsigned int i = 0; i < contours.size(); i++)
   {
-    for(unsigned int j=0; j<contours_oben_fixed.size();j++)
-//      if((abs(mu[i].nu20-mu_o[j].nu20)<0.0123) && (abs(mu[i].nu11-mu_o[j].nu11)<0.0123) && (abs(mu[i].nu02-mu_o[j].nu02)<0.0123) && (abs(mu[i].nu30-mu_o[j].nu30)<0.0123) && (abs(mu[i].nu21-mu_o[j].nu21)<0.0123) && (abs(mu[i].nu12-mu_o[j].nu12)<0.0123) && (abs(mu[i].nu03-mu_o[j].nu03)<0.0123))
-        if((abs(mu[i].nu20-mu_o[j].nu20)<0.01) && (abs(mu[i].nu11-mu_o[j].nu11)<0.01) && (abs(mu[i].nu02-mu_o[j].nu02)<0.01) && (abs(mu[i].nu30-mu_o[j].nu30)<0.01) && (abs(mu[i].nu21-mu_o[j].nu21)<0.01) && (abs(mu[i].nu12-mu_o[j].nu12)<0.01) && (abs(mu[i].nu03-mu_o[j].nu03)<0.01))
+    for(unsigned int j = 0; j < contours_oben_fixed.size(); j++)
+//      if((abs(mu[i].nu20-mu_o[j].nu20)<0.00723) && (abs(mu[i].nu11-mu_o[j].nu11)<0.00723) && (abs(mu[i].nu02-mu_o[j].nu02)<0.00723) && (abs(mu[i].nu30-mu_o[j].nu30)<0.00723) && (abs(mu[i].nu21-mu_o[j].nu21)<0.00723) && (abs(mu[i].nu12-mu_o[j].nu12)<0.00723) && (abs(mu[i].nu03-mu_o[j].nu03)<0.00723))
+      if((abs(mu[i].nu20 - mu_o[j].nu20) < 0.007) && (abs(mu[i].nu11 - mu_o[j].nu11) < 0.007)
+          && (abs(mu[i].nu02 - mu_o[j].nu02) < 0.007) && (abs(mu[i].nu30 - mu_o[j].nu30) < 0.007)
+          && (abs(mu[i].nu21 - mu_o[j].nu21) < 0.007) && (abs(mu[i].nu12 - mu_o[j].nu12) < 0.007)
+          && (abs(mu[i].nu03 - mu_o[j].nu03) < 0.007))
 
       {
         std::cout << "C oben detected " << std::endl;
@@ -550,15 +528,15 @@ void thresh_callback(int, void* )
       }
   }
 
-
-
-
   //C links oben schraeg Detektion
-  for(unsigned int i = 0; i<contours.size();i++)
+  for(unsigned int i = 0; i < contours.size(); i++)
   {
-    for(unsigned int j=0; j<contours_los_fixed.size();j++)
-//      if((abs(mu[i].nu20-mu_los[j].nu20)<0.0123) && (abs(mu[i].nu11-mu_los[j].nu11)<0.0123) && (abs(mu[i].nu02-mu_los[j].nu02)<0.0123) && (abs(mu[i].nu30-mu_los[j].nu30)<0.0123) && (abs(mu[i].nu21-mu_los[j].nu21)<0.0123) && (abs(mu[i].nu12-mu_los[j].nu12)<0.0123) && (abs(mu[i].nu03-mu_los[j].nu03)<0.0123))
-        if((abs(mu[i].nu20-mu_los[j].nu20)<0.01) && (abs(mu[i].nu11-mu_los[j].nu11)<0.01) && (abs(mu[i].nu02-mu_los[j].nu02)<0.01) && (abs(mu[i].nu30-mu_los[j].nu30)<0.01) && (abs(mu[i].nu21-mu_los[j].nu21)<0.01) && (abs(mu[i].nu12-mu_los[j].nu12)<0.01) && (abs(mu[i].nu03-mu_los[j].nu03)<0.01))
+    for(unsigned int j = 0; j < contours_los_fixed.size(); j++)
+//      if((abs(mu[i].nu20-mu_los[j].nu20)<0.00723) && (abs(mu[i].nu11-mu_los[j].nu11)<0.00723) && (abs(mu[i].nu02-mu_los[j].nu02)<0.00723) && (abs(mu[i].nu30-mu_los[j].nu30)<0.00723) && (abs(mu[i].nu21-mu_los[j].nu21)<0.00723) && (abs(mu[i].nu12-mu_los[j].nu12)<0.00723) && (abs(mu[i].nu03-mu_los[j].nu03)<0.00723))
+      if((abs(mu[i].nu20 - mu_los[j].nu20) < 0.007) && (abs(mu[i].nu11 - mu_los[j].nu11) < 0.007)
+          && (abs(mu[i].nu02 - mu_los[j].nu02) < 0.007) && (abs(mu[i].nu30 - mu_los[j].nu30) < 0.007)
+          && (abs(mu[i].nu21 - mu_los[j].nu21) < 0.007) && (abs(mu[i].nu12 - mu_los[j].nu12) < 0.007)
+          && (abs(mu[i].nu03 - mu_los[j].nu03) < 0.007))
 
       {
         std::cout << "C links oben schraeg detected " << std::endl;
@@ -579,15 +557,15 @@ void thresh_callback(int, void* )
       }
   }
 
-
-
-
   //C links unten schraeg Detektion
-  for(unsigned int i = 0; i<contours.size();i++)
+  for(unsigned int i = 0; i < contours.size(); i++)
   {
-    for(unsigned int j=0; j<contours_lus_fixed.size();j++)
-//      if((abs(mu[i].nu20-mu_lus[j].nu20)<0.0123) && (abs(mu[i].nu11-mu_lus[j].nu11)<0.0123) && (abs(mu[i].nu02-mu_lus[j].nu02)<0.0123) && (abs(mu[i].nu30-mu_lus[j].nu30)<0.0123) && (abs(mu[i].nu21-mu_lus[j].nu21)<0.0123) && (abs(mu[i].nu12-mu_lus[j].nu12)<0.0123) && (abs(mu[i].nu03-mu_lus[j].nu03)<0.0123))
-        if((abs(mu[i].nu20-mu_lus[j].nu20)<0.01) && (abs(mu[i].nu11-mu_lus[j].nu11)<0.01) && (abs(mu[i].nu02-mu_lus[j].nu02)<0.01) && (abs(mu[i].nu30-mu_lus[j].nu30)<0.01) && (abs(mu[i].nu21-mu_lus[j].nu21)<0.01) && (abs(mu[i].nu12-mu_lus[j].nu12)<0.01) && (abs(mu[i].nu03-mu_lus[j].nu03)<0.01))
+    for(unsigned int j = 0; j < contours_lus_fixed.size(); j++)
+//      if((abs(mu[i].nu20-mu_lus[j].nu20)<0.00723) && (abs(mu[i].nu11-mu_lus[j].nu11)<0.00723) && (abs(mu[i].nu02-mu_lus[j].nu02)<0.00723) && (abs(mu[i].nu30-mu_lus[j].nu30)<0.00723) && (abs(mu[i].nu21-mu_lus[j].nu21)<0.00723) && (abs(mu[i].nu12-mu_lus[j].nu12)<0.00723) && (abs(mu[i].nu03-mu_lus[j].nu03)<0.00723))
+      if((abs(mu[i].nu20 - mu_lus[j].nu20) < 0.007) && (abs(mu[i].nu11 - mu_lus[j].nu11) < 0.007)
+          && (abs(mu[i].nu02 - mu_lus[j].nu02) < 0.007) && (abs(mu[i].nu30 - mu_lus[j].nu30) < 0.007)
+          && (abs(mu[i].nu21 - mu_lus[j].nu21) < 0.007) && (abs(mu[i].nu12 - mu_lus[j].nu12) < 0.007)
+          && (abs(mu[i].nu03 - mu_lus[j].nu03) < 0.007))
 
       {
         std::cout << "C links unten schraeg detected " << std::endl;
@@ -608,15 +586,15 @@ void thresh_callback(int, void* )
       }
   }
 
-
-
-
   //C rechts oben schraeg Detektion
-  for(unsigned int i = 0; i<contours.size();i++)
+  for(unsigned int i = 0; i < contours.size(); i++)
   {
-    for(unsigned int j=0; j<contours_ros_fixed.size();j++)
-//      if((abs(mu[i].nu20-mu_ros[j].nu20)<0.0123) && (abs(mu[i].nu11-mu_ros[j].nu11)<0.0123) && (abs(mu[i].nu02-mu_ros[j].nu02)<0.0123) && (abs(mu[i].nu30-mu_ros[j].nu30)<0.0123) && (abs(mu[i].nu21-mu_ros[j].nu21)<0.0123) && (abs(mu[i].nu12-mu_ros[j].nu12)<0.0123) && (abs(mu[i].nu03-mu_ros[j].nu03)<0.0123))
-        if((abs(mu[i].nu20-mu_ros[j].nu20)<0.01) && (abs(mu[i].nu11-mu_ros[j].nu11)<0.01) && (abs(mu[i].nu02-mu_ros[j].nu02)<0.01) && (abs(mu[i].nu30-mu_ros[j].nu30)<0.01) && (abs(mu[i].nu21-mu_ros[j].nu21)<0.01) && (abs(mu[i].nu12-mu_ros[j].nu12)<0.01) && (abs(mu[i].nu03-mu_ros[j].nu03)<0.01))
+    for(unsigned int j = 0; j < contours_ros_fixed.size(); j++)
+//      if((abs(mu[i].nu20-mu_ros[j].nu20)<0.00723) && (abs(mu[i].nu11-mu_ros[j].nu11)<0.00723) && (abs(mu[i].nu02-mu_ros[j].nu02)<0.00723) && (abs(mu[i].nu30-mu_ros[j].nu30)<0.00723) && (abs(mu[i].nu21-mu_ros[j].nu21)<0.00723) && (abs(mu[i].nu12-mu_ros[j].nu12)<0.00723) && (abs(mu[i].nu03-mu_ros[j].nu03)<0.00723))
+      if((abs(mu[i].nu20 - mu_ros[j].nu20) < 0.007) && (abs(mu[i].nu11 - mu_ros[j].nu11) < 0.007)
+          && (abs(mu[i].nu02 - mu_ros[j].nu02) < 0.007) && (abs(mu[i].nu30 - mu_ros[j].nu30) < 0.007)
+          && (abs(mu[i].nu21 - mu_ros[j].nu21) < 0.007) && (abs(mu[i].nu12 - mu_ros[j].nu12) < 0.007)
+          && (abs(mu[i].nu03 - mu_ros[j].nu03) < 0.007))
 
       {
         std::cout << "C rechts oben schraeg detected " << std::endl;
@@ -637,15 +615,15 @@ void thresh_callback(int, void* )
       }
   }
 
-
-
-
   //C rechts unten schraeg Detektion
-  for(unsigned int i = 0; i<contours.size();i++)
+  for(unsigned int i = 0; i < contours.size(); i++)
   {
-    for(unsigned int j=0; j<contours_rus_fixed.size();j++)
-//      if((abs(mu[i].nu20-mu_rus[j].nu20)<0.0123) && (abs(mu[i].nu11-mu_rus[j].nu11)<0.0123) && (abs(mu[i].nu02-mu_rus[j].nu02)<0.0123) && (abs(mu[i].nu30-mu_rus[j].nu30)<0.0123) && (abs(mu[i].nu21-mu_rus[j].nu21)<0.0123) && (abs(mu[i].nu12-mu_rus[j].nu12)<0.0123) && (abs(mu[i].nu03-mu_rus[j].nu03)<0.0123))
-        if((abs(mu[i].nu20-mu_rus[j].nu20)<0.01) && (abs(mu[i].nu11-mu_rus[j].nu11)<0.01) && (abs(mu[i].nu02-mu_rus[j].nu02)<0.01) && (abs(mu[i].nu30-mu_rus[j].nu30)<0.01) && (abs(mu[i].nu21-mu_rus[j].nu21)<0.01) && (abs(mu[i].nu12-mu_rus[j].nu12)<0.01) && (abs(mu[i].nu03-mu_rus[j].nu03)<0.01))
+    for(unsigned int j = 0; j < contours_rus_fixed.size(); j++)
+//      if((abs(mu[i].nu20-mu_rus[j].nu20)<0.00723) && (abs(mu[i].nu11-mu_rus[j].nu11)<0.00723) && (abs(mu[i].nu02-mu_rus[j].nu02)<0.00723) && (abs(mu[i].nu30-mu_rus[j].nu30)<0.00723) && (abs(mu[i].nu21-mu_rus[j].nu21)<0.00723) && (abs(mu[i].nu12-mu_rus[j].nu12)<0.00723) && (abs(mu[i].nu03-mu_rus[j].nu03)<0.00723))
+      if((abs(mu[i].nu20 - mu_rus[j].nu20) < 0.007) && (abs(mu[i].nu11 - mu_rus[j].nu11) < 0.007)
+          && (abs(mu[i].nu02 - mu_rus[j].nu02) < 0.007) && (abs(mu[i].nu30 - mu_rus[j].nu30) < 0.007)
+          && (abs(mu[i].nu21 - mu_rus[j].nu21) < 0.007) && (abs(mu[i].nu12 - mu_rus[j].nu12) < 0.007)
+          && (abs(mu[i].nu03 - mu_rus[j].nu03) < 0.007))
 
       {
 
@@ -663,15 +641,6 @@ void thresh_callback(int, void* )
 
 
 
-
-//  std::cout << " Before bubblesort " << std::endl;
-//  std::cout << "Num " << num[0] << " Nam " << nam[0] << std::endl;
-//  std::cout << "Num " << num[1] << " Nam " << nam[1] << std::endl;
-//  std::cout << "Num " << num[2] << " Nam " << nam[2] << std::endl;
-
-
-
-
 //  Bubblesort - find maximum area, minimum area and middle sized area
   int flag = 1;    // set flag to 1 to start first pass
   double temp;             // holding variable
@@ -680,135 +649,53 @@ void thresh_callback(int, void* )
   for(unsigned int i = 1; (i <= 3) && flag; i++)
   {
     flag = 0;
-    for (unsigned int j=0; j < (3 -1); j++)
+    for(unsigned int j = 0; j < (3 - 1); j++)
     {
-      if (num[j+1] > num[j])      // ascending order simply changes to <
+      if(num[j + 1] > num[j])      // ascending order simply changes to <
       {
         temp = num[j];             // swap elements
-        num[j] = num[j+1];
-        num[j+1] = temp;
+        num[j] = num[j + 1];
+        num[j + 1] = temp;
         temp_nam = nam[j];
-        nam[j] = nam[j+1];
-        nam[j+1] = temp_nam;
+        nam[j] = nam[j + 1];
+        nam[j + 1] = temp_nam;
         flag = 1;               // indicates that a swap occurred.
       }
     }
   }
 
-//  Num[0] = maxArea, num[1] = midArea, num[2] = minArea -> nur nam[] ist interessant um herauszufinden welches C
-//  for(unsigned int x = 0; x<sizeof(nam);x++)
-//  {
-//   if(x==0)
-//   {
-//     std::cout << "Outer " << std::endl;
-//     if(nam[x]==1)
-//       std::cout << "C Bottom " << std::endl;
-//     else if(nam[x]==2)
-//       std::cout << "C Left " << std::endl;
-//     else if(nam[x]==3)
-//       std::cout << "C Right " << std::endl;
-//     else if(nam[x]==4)
-//       std::cout << "C Top " << std::endl;
-//     else if(nam[x]==5)
-//       std::cout << "C Left Top " << std::endl;
-//     else if(nam[x]==6)
-//       std::cout << "C Left Bottom " << std::endl;
-//     else if(nam[x]==7)
-//       std::cout << "C Right Top " << std::endl;
-//     else if(nam[x]==8)
-//       std::cout << "C Right Bottom " << std::endl;
-//   }
-//
-//
-//   else
-//    if(x==1)
-//    {
-//      std::cout << "Mid " << std::endl;
-//      if(nam[x]==1)
-//        std::cout << "C Bottom " << std::endl;
-//      else if(nam[x]==2)
-//        std::cout << "C Left " << std::endl;
-//      else if(nam[x]==3)
-//        std::cout << "C Right " << std::endl;
-//      else if(nam[x]==4)
-//        std::cout << "C Top " << std::endl;
-//      else if(nam[x]==5)
-//        std::cout << "C Left Top " << std::endl;
-//      else if(nam[x]==6)
-//        std::cout << "C Left Bottom " << std::endl;
-//      else if(nam[x]==7)
-//        std::cout << "C Right Top " << std::endl;
-//      else if(nam[x]==8)
-//        std::cout << "C Right Bottom " << std::endl;
-//    }
-//   else
-//     if(x==2)
-//     {
-//       std::cout << "Inner " << std::endl;
-//       if(nam[x]==1)
-//         std::cout << "C Bottom " << std::endl;
-//       else if(nam[x]==2)
-//         std::cout << "C Left " << std::endl;
-//       else if(nam[x]==3)
-//         std::cout << "C Right " << std::endl;
-//       else if(nam[x]==4)
-//         std::cout << "C Top " << std::endl;
-//       else if(nam[x]==5)
-//         std::cout << "C Left Top " << std::endl;
-//       else if(nam[x]==6)
-//         std::cout << "C Left Bottom " << std::endl;
-//       else if(nam[x]==7)
-//         std::cout << "C Right Top " << std::endl;
-//       else if(nam[x]==8)
-//         std::cout << "C Right Bottom " << std::endl;
-//
-//     }
-//
-//
-//
-//  }
-
-
-
-
-
-
 
 
   ///  Get the mass centers:
-  vector<Point2f> mc( contours.size() );
-  for( int i = 0; i < contours.size(); i++ )
-     { mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); }
+  vector<Point2f> mc(contours.size());
+  for(int i = 0; i < contours.size(); i++)
+  {
+    mc[i] = Point2f(mu[i].m10 / mu[i].m00, mu[i].m01 / mu[i].m00);
+  }
 
   /// Draw contours
-  Mat drawing = Mat::zeros( canny_output.size(), CV_8UC3 );
-  Scalar color = Scalar( 0, 0,255);
-  for( int i = 0; i< contours.size(); i++ )
-   {
-     if(contours[i].size() < 50) continue;
-
+  Mat drawing = Mat::zeros(canny_output.size(), CV_8UC3);
+  Scalar color = Scalar(0, 0, 255);
+  for(int i = 0; i < contours.size(); i++)
+  {
+//    std::cout << "contours " << contours[i].size() << std::endl;
+    if((contours[i].size() < 30)&&(contours[i].size() > 7))
+    {
+//      std::cout << "contours " << contours[i].size() << std::endl;
+      continue;
+    }
 
 //     drawContours( drawing, contours,   i, color, 2, 8, hierarchy, 0, Point() );
 //     circle( drawing, mc[i], 4, color, -1, 8, 0 );
-   }
+  }
 
 
-  //Publish image with contour
-//  sensor_msgs::ImagePtr msg_contours = cv_bridge::CvImage(std_msgs::Header(), "bgr8", drawing).toImageMsg();
-//  pubContours.publish(msg_contours);
-
-//
-//
-//  drawContours(frame->image, g_detected_contours,-1, color, 3);
-////  imshow("DetectedContours", _Input);
-//
-//  std::cout << "Check 1 " << std::endl;
-//
   //Find cirle around contour
   double cx;
   double cy;
   float radius;
   Point2f center;
+  Point2f center_old;
 //  Mat circle;
   Mat canny_circle;
   Mat canny_diff;
@@ -816,59 +703,42 @@ void thresh_callback(int, void* )
   vector<vector<Point> > contour_circle;
   vector<vector<Point> > contour_diff;
   vector<vector<Point> > contour_roi;
-  Scalar color_diff = Scalar( 0, 255,0);
+  Scalar color_diff = Scalar(0, 255, 0);
   Mat C_area;
   Mat gap;
 
-
-  for(int i=0; i< g_detected_contours.size(); i++)
+  for(int i = 0; i < g_detected_contours.size(); i++)
   {
-	  minEnclosingCircle(g_detected_contours.at(i), center, radius);
+    minEnclosingCircle(g_detected_contours.at(i), center, radius);
 
-	  if(radius < 20) continue;
+//    std::cout << "radius " << radius << std::endl;
+//    if((radius < 50) &&(radius > 5))
+//    {
+////      std::cout << "radius " << radius << std::endl;
+//      continue;
+//    }
 
+//    if(abs(center_old.x - center.x) > 10)
+//     break;
+//    else
 
-	  std::cout << "Center " << center << std::endl;
-	  std::cout << "Radius " << radius << std::endl;
-	  Rect r(center.x-radius, center.y-radius, radius*2, radius*2);
-	  circle(frame->image,center,radius,(0,255,0),2);
-//	  Mat roi(_Input, r);
-//	  Canny(roi, canny_roi, thresh, thresh*2, 3);
-//	  findContours(canny_roi, contour_roi, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
-//	  Mat mask(roi.size(), roi.type(), Scalar::all(0));
-//	  std::cout << "Check 3 " << std::endl;
-//	  circle(mask, Point(radius,radius), radius, Scalar::all(255), -1);
-//	  std::cout << "Check 3 a" << std::endl;
-//	  Mat diff = roi & mask;
-//	  std::cout << "Check 3 b " << std::endl;
-//	  Mat C_area = Mat(g_detected_contours.at(i));
-//	  std::cout << "Check 3 c" << std::endl;
-//	  subtract(diff, C_area, gap);
-//	  std::cout << "Check 4 " << std::endl;
+      Rect r(center.x - radius, center.y - radius, radius * 2, radius * 2);
+      circle(frame->image, center, radius, (0, 0, 255), 2);
 
+//    std::cout << "Center " << center << std::endl;
+//    std::cout << "Radius " << radius << std::endl;
 
+    center_old = center;
 
-//	  Mat C_roi(_Input, g_detected_contours.at(i));
-//	  subtract(roi, C_roi, gap);
-	  //Find contours of enclosing circle
-//	  Canny(circle, canny_circle, thresh, thresh*2, 3);
-//	  findContours(canny_circle, contour_circle, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
-//	  //Subtract C contour from circle contour
-//	  subtract(contour_circle.at(i), g_detected_contours.at(i), diff);
-//	  //Find contours of difference
-//	  Canny(gap, canny_diff, thresh, thresh*2,3);
-//	  findContours(canny_diff, contour_diff, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
-//	  drawContours(_Input, contour_diff, -1, color_diff, 3);
-//	  std::cout << "Check 5 " << std::endl;
 
   }
 //  drawContours(_Input, contour_roi, -1, Scalar(0,0,255), CV_FILLED);
-  drawContours(frame->image, g_detected_contours,-1, Scalar(255), CV_FILLED);
+  drawContours(frame->image, g_detected_contours, -1, Scalar(0,255,0), CV_FILLED);
 //  imshow("DetectedContours", _Input);
   //Publish image with contour
+//  std::cout << frame->image.cols << std::endl;
   sensor_msgs::ImagePtr msg_detected = cv_bridge::CvImage(std_msgs::Header(), frame->encoding, frame->image).toImageMsg();
   pubContours.publish(msg_detected);
-
 
   /// Calculate the area with the moments 00 and compare with the result of the OpenCV function
 //  printf("\t Info: Area and Contour Length \n");
