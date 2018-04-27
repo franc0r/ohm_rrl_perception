@@ -66,7 +66,10 @@ MotionDetectionNode::MotionDetectionNode(void)
   _img_pub        = _it.advertise(motion_image_topic, 1);
 
 
-  _bg = cv::createBackgroundSubtractorMOG2(); // new cv::BackgroundSubtractorMOG2(_frames, _threshold, true);
+  const auto history_ = 2;
+  const auto varThreshold_ = 15;
+  const auto shadowCompensation = true;
+  _bg = cv::createBackgroundSubtractorMOG2(history_, varThreshold_, shadowCompensation); // new cv::BackgroundSubtractorMOG2(_frames, _threshold, true);
 }
 
 void MotionDetectionNode::callbackImage(const sensor_msgs::ImageConstPtr& img)
@@ -95,9 +98,9 @@ void MotionDetectionNode::callbackImage(const sensor_msgs::ImageConstPtr& img)
 
 
     cv_bridge::CvImage output;
-    output.header = img->header;
+    output.header   = img->header;
     output.encoding = enc::BGR8;
-    output.image = frame;
+    output.image    = frame;
     _img_pub.publish(output.toImageMsg());
 
 
@@ -129,15 +132,39 @@ cv::Mat MotionDetectionNode::calculateContours(const sensor_msgs::ImageConstPtr&
    cv::GaussianBlur(frame, blurred, cv::Size(kernel_size,kernel_size),kernel_size,kernel_size);
 
    _bg->apply(blurred, front, -1); // automatic learning rate
+   _bg->setShadowThreshold(200.0);
+   _bg->setVarMax ( 255.0);
    _bg->getBackgroundImage(back);
 
-   cv::erode( front, front, cv::Mat());
-   cv::dilate(front, front, cv::Mat());
-   cv::dilate(front, front, cv::Mat());
+   cv::Mat thresholdedDifference_;
+//   cv::subtract(front, back, thresholdedDifference_);
+
+
+
+
+   cv::Mat kernel_erode = getStructuringElement(cv::MORPH_RECT, cv::Size(5, 5));
+
+   cv::erode( front, front, kernel_erode);
+   cv::dilate(front, front, kernel_erode);
+//   cv::dilate(front, front, kernel_erode);
+
+   cv::imshow("Background", back);
+   cv::imshow("front", front);
+//   cv::imshow("thresholdedDifference_", thresholdedDifference_);
+   cv::waitKey(10);
 
    if(_config.show_contours) {
      cv::findContours(front, _contours, _hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0) );
-     cv::drawContours(frame, _contours, -1, cv::Scalar(0,0,255), 2);
+
+     // remove contors with small size
+     std::vector<std::vector<cv::Point> > filtered_contours;
+     for(unsigned int i=0 ; i<_contours.size() ; ++i)
+     {
+       if(_contours[i].size() > _config.min_contour_size)
+         filtered_contours.push_back(_contours[i]);
+     }
+
+     cv::drawContours(frame, filtered_contours, -1, cv::Scalar(0,0,255), 2);
    }
    return frame;
 }
