@@ -134,6 +134,7 @@ cv::Mat MotionDetectionNode::calculateContours(const sensor_msgs::ImageConstPtr&
    _bg->apply(blurred, front, -1); // automatic learning rate
    _bg->setShadowThreshold(200.0);
    _bg->setVarMax ( 255.0);
+   _bg->setHistory(_config.nr_of_frames);
    _bg->getBackgroundImage(back);
 
    cv::Mat thresholdedDifference_;
@@ -148,10 +149,10 @@ cv::Mat MotionDetectionNode::calculateContours(const sensor_msgs::ImageConstPtr&
    cv::dilate(front, front, kernel_erode);
 //   cv::dilate(front, front, kernel_erode);
 
-   cv::imshow("Background", back);
-   cv::imshow("front", front);
-//   cv::imshow("thresholdedDifference_", thresholdedDifference_);
-   cv::waitKey(10);
+//   cv::imshow("Background", back);
+//   cv::imshow("front", front);
+////   cv::imshow("thresholdedDifference_", thresholdedDifference_);
+//   cv::waitKey(10);
 
    if(_config.show_contours) {
      cv::findContours(front, _contours, _hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, cv::Point(0, 0) );
