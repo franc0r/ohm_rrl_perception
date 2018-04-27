@@ -14,14 +14,14 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
 )
 
-#
-#
-#if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
-#  find_package(Qt5Widgets REQUIRED)
-#else()
-#  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
-#  include(${QT_USE_FILE})
-#endif()
+
+
+if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
+  find_package(Qt5Widgets REQUIRED)
+else()
+  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
+  include(${QT_USE_FILE})
+endif()
 
 
 ## System dependencies are found with CMake's conventions
