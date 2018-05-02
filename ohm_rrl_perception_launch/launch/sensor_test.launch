@@ -33,6 +33,11 @@
       <arg name="input_image_topic" value="$(arg perception_topic)" />
       <arg name="img_qr_topic"      value="img_qr" />
   </include> 
+  
+  <!-- pkg="ohm_rrl_cdetection" name="auto_c_detect_node" type="auto_c_detect_node" output="screen" >
+    <remap from="/gripper/color/image_raw"  to="$(arg perception_topic)"/>
+    <param name="path_to_template"  value="$(find ohm_rrl_cdetection)/images/"/>
+  </node-->
 
 
 </launch>
