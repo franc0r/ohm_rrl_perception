@@ -5,7 +5,7 @@
  *      Author: jon
  */
 
-#include "../../ohm_rrl_qtdetection/src/QrCodeToWorld.h"
+#include "../../ohm_rrl_qrdetection/src/QrCodeToWorld.h"
 
 #include <visualization_msgs/Marker.h>
 #include <geometry_msgs/Point.h>

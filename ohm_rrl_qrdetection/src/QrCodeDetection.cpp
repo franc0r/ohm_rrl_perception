@@ -5,7 +5,8 @@
  *      Author: jon
  */
 
-#include "QrCodeDetection.h"
+#include "../../ohm_rrl_qrdetection/src/QrCodeDetection.h"
+
 #include <cv_bridge/cv_bridge.h>
 //#include <sensor_msgs/image_encodings.h>
 

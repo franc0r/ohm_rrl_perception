@@ -7,7 +7,7 @@
 
 #include <ros/ros.h>
 
-#include "../../ohm_rrl_qtdetection/src/QrCodeToWorld.h"
+#include "../../ohm_rrl_qrdetection/src/QrCodeToWorld.h"
 
 int main(int argc, char** argv)
 {

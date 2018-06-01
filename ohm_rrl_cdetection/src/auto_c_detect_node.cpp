@@ -1,7 +1,7 @@
 ﻿/**
  * @file   auto_thermal_c_detect_node.cpp
  * @author Johanna Gleichauf
- * @date   Stand 25.04.2018
+ * @date   Stand 01.06.2018
  *
  *
  */
@@ -37,6 +37,34 @@
 
 using namespace cv;
 using namespace std;
+
+// Struct for C-Template
+struct c_template{
+  string name;
+  Mat src;
+  Mat gray;
+  unsigned int kernel_size = 1;
+  Mat canny;
+  vector<vector<Point>> contours;
+  vector<Moments> mu;
+
+};
+
+
+//
+//c_template bottom;
+//c_template left;
+//c_template right;
+//c_template top;
+//c_template top_left;
+//c_template top_right;
+//c_template bottom_left;
+//c_template bottom_right;
+
+
+// Create c_templates vector
+vector<c_template> cs;
+
 
 Mat src_unten;
 Mat src_unten_gray;
@@ -82,6 +110,8 @@ RNG rng(12345);
 /// Function header
 void thresh_callback(int, void*);
 
+
+
 cv::Mat _Input;
 cv::Mat _InputM;
 cv::Mat thermo_bin;
@@ -116,30 +146,56 @@ void callCam(const sensor_msgs::ImageConstPtr& camImage)
 
   const unsigned int kernel_size = 1;
 
-  /// Convert image to gray and blur it -> Graubild
-  cvtColor(src_unten, src_unten_gray, CV_BGR2GRAY);
-  blur(src_unten_gray, src_unten_gray, Size(kernel_size, kernel_size));
-  /// Convert image to gray and blur it
-  cvtColor(src_links, src_links_gray, CV_BGR2GRAY);
-  blur(src_links_gray, src_links_gray, Size(kernel_size, kernel_size));
-  /// Convert image to gray and blur it
-  //  cvtColor( src_rechts, src_rechts_gray, CV_BGR2GRAY );
-  //  blur( src_rechts_gray, src_rechts_gray, Size(3,3) );
-  /// Convert image to gray and blur it
-  cvtColor(src_oben, src_oben_gray, CV_BGR2GRAY);
-  blur(src_oben_gray, src_oben_gray, Size(kernel_size, kernel_size));
-  /// Convert image to gray and blur it
-  cvtColor(src_los, src_los_gray, CV_BGR2GRAY);
-  blur(src_los_gray, src_los_gray, Size(kernel_size, kernel_size));
-  /// Convert image to gray and blur it
-  cvtColor(src_lus, src_lus_gray, CV_BGR2GRAY);
-  blur(src_lus_gray, src_lus_gray, Size(kernel_size, kernel_size));
-  /// Convert image to gray and blur it
-  cvtColor(src_ros, src_ros_gray, CV_BGR2GRAY);
-  blur(src_ros_gray, src_ros_gray, Size(kernel_size, kernel_size));
-  /// Convert image to gray and blur it
-  cvtColor(src_rus, src_rus_gray, CV_BGR2GRAY);
-  blur(src_rus_gray, src_rus_gray, Size(kernel_size, kernel_size));
+
+
+  //Fill c-template vector
+  for(unsigned int i=0; i<=7; i++)
+    cs.push_back(c_template());
+
+  // Assignment C Templates
+  cs[0].name = "bottom";
+  cs[1].name = "top";
+  cs[2].name = "left";
+  cs[3].name = "right";
+  cs[4].name = "bottom_right";
+  cs[5].name = "bottom_left";
+  cs[6].name = "top_right";
+  cs[7].name = "top_left";
+
+  //Convert C-Template image and blur it
+  for(unsigned int j=0; j<=cs.size(); j++)
+  {
+    cvtColor(cs[j].src, cs[j].gray, CV_BGR2GRAY);
+    blur(cs[j].gray, cs[j].gray, Size(cs[j].kernel_size, cs[j].kernel_size));
+  }
+
+
+// TODO: Remove once vector based approach for c templates has been tested
+
+//  /// Convert image to gray and blur it -> Graubild
+//  cvtColor(src_unten, src_unten_gray, CV_BGR2GRAY);
+//  blur(src_unten_gray, src_unten_gray, Size(kernel_size, kernel_size));
+//  /// Convert image to gray and blur it
+//  cvtColor(src_links, src_links_gray, CV_BGR2GRAY);
+//  blur(src_links_gray, src_links_gray, Size(kernel_size, kernel_size));
+//  /// Convert image to gray and blur it
+//  //  cvtColor( src_rechts, src_rechts_gray, CV_BGR2GRAY );
+//  //  blur( src_rechts_gray, src_rechts_gray, Size(3,3) );
+//  /// Convert image to gray and blur it
+//  cvtColor(src_oben, src_oben_gray, CV_BGR2GRAY);
+//  blur(src_oben_gray, src_oben_gray, Size(kernel_size, kernel_size));
+//  /// Convert image to gray and blur it
+//  cvtColor(src_los, src_los_gray, CV_BGR2GRAY);
+//  blur(src_los_gray, src_los_gray, Size(kernel_size, kernel_size));
+//  /// Convert image to gray and blur it
+//  cvtColor(src_lus, src_lus_gray, CV_BGR2GRAY);
+//  blur(src_lus_gray, src_lus_gray, Size(kernel_size, kernel_size));
+//  /// Convert image to gray and blur it
+//  cvtColor(src_ros, src_ros_gray, CV_BGR2GRAY);
+//  blur(src_ros_gray, src_ros_gray, Size(kernel_size, kernel_size));
+//  /// Convert image to gray and blur it
+//  cvtColor(src_rus, src_rus_gray, CV_BGR2GRAY);
+//  blur(src_rus_gray, src_rus_gray, Size(kernel_size, kernel_size));
 
   thresh_callback(0, 0);
 
@@ -249,58 +305,75 @@ int main(int argc, char** argv)
 void thresh_callback(int, void*)
 {
   Mat canny_output;
-//  Mat canny_thermal;
-  Mat canny_unten_fixed;
-  Mat canny_links_fixed;
-  Mat canny_rechts_fixed;
-  Mat canny_oben_fixed;
-  Mat canny_los_fixed;
-  Mat canny_lus_fixed;
-  Mat canny_ros_fixed;
-  Mat canny_rus_fixed;
+
+//TODO: Remove once vector based approach for c template has been tested
+  ////  Mat canny_thermal;
+//  Mat canny_unten_fixed;
+//  Mat canny_links_fixed;
+//  Mat canny_rechts_fixed;
+//  Mat canny_oben_fixed;
+//  Mat canny_los_fixed;
+//  Mat canny_lus_fixed;
+//  Mat canny_ros_fixed;
+//  Mat canny_rus_fixed;
 
   vector<vector<Point> > contours;
-//  vector<vector<Point> > contours_thermal;
-  vector<vector<Point> > contours_unten_fixed;
-  vector<vector<Point> > contours_links_fixed;
-  vector<vector<Point> > contours_rechts_fixed;
-  vector<vector<Point> > contours_oben_fixed;
-  vector<vector<Point> > contours_los_fixed;
-  vector<vector<Point> > contours_lus_fixed;
-  vector<vector<Point> > contours_ros_fixed;
-  vector<vector<Point> > contours_rus_fixed;
+
+//TODO: Remove once vector based approach for c template has been tested
+  ////  vector<vector<Point> > contours_thermal;
+//  vector<vector<Point> > contours_unten_fixed;
+//  vector<vector<Point> > contours_links_fixed;
+//  vector<vector<Point> > contours_rechts_fixed;
+//  vector<vector<Point> > contours_oben_fixed;
+//  vector<vector<Point> > contours_los_fixed;
+//  vector<vector<Point> > contours_lus_fixed;
+//  vector<vector<Point> > contours_ros_fixed;
+//  vector<vector<Point> > contours_rus_fixed;
+
   vector<Vec4i> hierarchy;
 
   //Edge detection and find contours
 
-  //Reference image
-  //  Detect edges using canny
-  Canny(src_unten_gray, canny_unten_fixed, thresh, thresh * 2, 3);
-  /// Find contours
-  findContours(canny_unten_fixed, contours_unten_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+  //Edge detection and find contours for all C-Templates
 
-  Canny(src_links_gray, canny_links_fixed, thresh, thresh * 2, 3);
-  //  std::cout << "before find contours " << std::endl;
-  // Find contours
-  findContours(canny_links_fixed, contours_links_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+  for(unsigned int k=0; k<=cs.size(); k++)
+  {
+    Canny(cs[k].gray, cs[k].canny, thresh, thresh * 2 , 3);
+    findContours(cs[k].canny, cs[k].contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-//  Canny(src_rechts_gray, canny_rechts_fixed, thresh, thresh*2,3);
-//  findContours(canny_rechts_fixed, contours_rechts_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+  }
 
-  Canny(src_oben_gray, canny_oben_fixed, thresh, thresh * 2, 3);
-  findContours(canny_oben_fixed, contours_oben_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
-  Canny(src_los_gray, canny_los_fixed, thresh, thresh * 2, 3);
-  findContours(canny_los_fixed, contours_los_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+// TODO: Remove once vector method is tested
 
-  Canny(src_lus_gray, canny_lus_fixed, thresh, thresh * 2, 3);
-  findContours(canny_lus_fixed, contours_lus_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-
-  Canny(src_ros_gray, canny_ros_fixed, thresh, thresh * 2, 3);
-  findContours(canny_ros_fixed, contours_ros_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
-
-  Canny(src_rus_gray, canny_rus_fixed, thresh, thresh * 2, 3);
-  findContours(canny_rus_fixed, contours_rus_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+//  //Reference image
+//  //  Detect edges using canny
+//  Canny(src_unten_gray, canny_unten_fixed, thresh, thresh * 2, 3);
+//  /// Find contours
+//  findContours(canny_unten_fixed, contours_unten_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+//
+//  Canny(src_links_gray, canny_links_fixed, thresh, thresh * 2, 3);
+//  //  std::cout << "before find contours " << std::endl;
+//  // Find contours
+//  findContours(canny_links_fixed, contours_links_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+//
+////  Canny(src_rechts_gray, canny_rechts_fixed, thresh, thresh*2,3);
+////  findContours(canny_rechts_fixed, contours_rechts_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0,0));
+//
+//  Canny(src_oben_gray, canny_oben_fixed, thresh, thresh * 2, 3);
+//  findContours(canny_oben_fixed, contours_oben_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+//
+//  Canny(src_los_gray, canny_los_fixed, thresh, thresh * 2, 3);
+//  findContours(canny_los_fixed, contours_los_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+//
+//  Canny(src_lus_gray, canny_lus_fixed, thresh, thresh * 2, 3);
+//  findContours(canny_lus_fixed, contours_lus_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+//
+//  Canny(src_ros_gray, canny_ros_fixed, thresh, thresh * 2, 3);
+//  findContours(canny_ros_fixed, contours_ros_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
+//
+//  Canny(src_rus_gray, canny_rus_fixed, thresh, thresh * 2, 3);
+//  findContours(canny_rus_fixed, contours_rus_fixed, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
   //RGB Image
   Canny(img_gray, canny_output, thresh, thresh * 2, 3);
@@ -308,69 +381,81 @@ void thresh_callback(int, void*)
   findContours(canny_output, contours, hierarchy, CV_RETR_TREE, CV_CHAIN_APPROX_SIMPLE, Point(0, 0));
 
   /// Get the moments
-  //Moments C unten
-  vector<Moments> mu_u(contours_unten_fixed.size());
-  for(unsigned int i = 0; i < contours_unten_fixed.size(); i++)
-  {
-    mu_u[i] = cv::moments(contours_unten_fixed[i], false);
 
-  }
+  // Get moments for all C-Templates
+  for(unsigned int i=0; i<cs.size(); i++)
+    for(unsigned int j=0; i<cs[i].contours.size(); j++)
+      {
+        cs[i].mu[j] = cv::moments(cs[i].contours[i], false);
+      }
 
-  //Moments C links
-  vector<Moments> mu_l(contours_links_fixed.size());
-  for(unsigned int i = 0; i < contours_links_fixed.size(); i++)
-  {
-    mu_l[i] = cv::moments(contours_links_fixed[i], false);
 
-  }
-
-  //Moments C links
-  vector<Moments> mu_r(contours_rechts_fixed.size());
-  for(unsigned int i = 0; i < contours_rechts_fixed.size(); i++)
-  {
-    mu_r[i] = cv::moments(contours_rechts_fixed[i], false);
-
-  }
-
-  //Moments C oben
-  vector<Moments> mu_o(contours_oben_fixed.size());
-  for(unsigned int i = 0; i < contours_oben_fixed.size(); i++)
-  {
-    mu_o[i] = cv::moments(contours_oben_fixed[i], false);
-
-  }
-
-  //Moments C links oben schraeg
-  vector<Moments> mu_los(contours_los_fixed.size());
-  for(unsigned int i = 0; i < contours_los_fixed.size(); i++)
-  {
-    mu_los[i] = cv::moments(contours_los_fixed[i], false);
-
-  }
-
-  //Moments C links unten schraeg
-  vector<Moments> mu_lus(contours_lus_fixed.size());
-  for(unsigned int i = 0; i < contours_lus_fixed.size(); i++)
-  {
-    mu_lus[i] = cv::moments(contours_lus_fixed[i], false);
-
-  }
-
-  //Moments C recht oben schraeg
-  vector<Moments> mu_ros(contours_ros_fixed.size());
-  for(unsigned int i = 0; i < contours_ros_fixed.size(); i++)
-  {
-    mu_ros[i] = cv::moments(contours_ros_fixed[i], false);
-
-  }
-
-  //Moments C recht oben schraeg
-  vector<Moments> mu_rus(contours_rus_fixed.size());
-  for(unsigned int i = 0; i < contours_rus_fixed.size(); i++)
-  {
-    mu_rus[i] = cv::moments(contours_rus_fixed[i], false);
-
-  }
+// TODO: Remove one vector approach for c templates has been tested
+//
+//  //Moments C unten
+//  vector<Moments> mu_u(contours_unten_fixed.size());
+//  for(unsigned int i = 0; i < contours_unten_fixed.size(); i++)
+//  {
+//    mu_u[i] = cv::moments(contours_unten_fixed[i], false);
+//
+//  }
+//
+//
+//  //Moments C links
+//  vector<Moments> mu_l(contours_links_fixed.size());
+//  for(unsigned int i = 0; i < contours_links_fixed.size(); i++)
+//  {
+//    mu_l[i] = cv::moments(contours_links_fixed[i], false);
+//
+//  }
+//
+//  //Moments C links
+//  vector<Moments> mu_r(contours_rechts_fixed.size());
+//  for(unsigned int i = 0; i < contours_rechts_fixed.size(); i++)
+//  {
+//    mu_r[i] = cv::moments(contours_rechts_fixed[i], false);
+//
+//  }
+//
+//  //Moments C oben
+//  vector<Moments> mu_o(contours_oben_fixed.size());
+//  for(unsigned int i = 0; i < contours_oben_fixed.size(); i++)
+//  {
+//    mu_o[i] = cv::moments(contours_oben_fixed[i], false);
+//
+//  }
+//
+//  //Moments C links oben schraeg
+//  vector<Moments> mu_los(contours_los_fixed.size());
+//  for(unsigned int i = 0; i < contours_los_fixed.size(); i++)
+//  {
+//    mu_los[i] = cv::moments(contours_los_fixed[i], false);
+//
+//  }
+//
+//  //Moments C links unten schraeg
+//  vector<Moments> mu_lus(contours_lus_fixed.size());
+//  for(unsigned int i = 0; i < contours_lus_fixed.size(); i++)
+//  {
+//    mu_lus[i] = cv::moments(contours_lus_fixed[i], false);
+//
+//  }
+//
+//  //Moments C recht oben schraeg
+//  vector<Moments> mu_ros(contours_ros_fixed.size());
+//  for(unsigned int i = 0; i < contours_ros_fixed.size(); i++)
+//  {
+//    mu_ros[i] = cv::moments(contours_ros_fixed[i], false);
+//
+//  }
+//
+//  //Moments C recht oben schraeg
+//  vector<Moments> mu_rus(contours_rus_fixed.size());
+//  for(unsigned int i = 0; i < contours_rus_fixed.size(); i++)
+//  {
+//    mu_rus[i] = cv::moments(contours_rus_fixed[i], false);
+//
+//  }
 
   //Moments incoming image camera
   vector<Moments> mu(contours.size());
