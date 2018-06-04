@@ -1,6 +1,6 @@
 <package>
   <name>ohm_rrl_perception</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>Meta package for the perception in the robocup rescue league</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
