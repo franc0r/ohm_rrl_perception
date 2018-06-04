@@ -1,0 +1,12 @@
+Source: ros-indigo-ohm-rrl-motiondetection
+Section: misc
+Priority: extra
+Maintainer: chris <christian.pfitzner@th-nuernberg.de>
+Build-Depends: debhelper (>= 9.0.0), ros-indigo-catkin, ros-indigo-cv-bridge, ros-indigo-dynamic-reconfigure, ros-indigo-image-transport, ros-indigo-roscpp, ros-indigo-sensor-msgs, ros-indigo-std-msgs
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-indigo-ohm-rrl-motiondetection
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-indigo-cv-bridge, ros-indigo-dynamic-reconfigure, ros-indigo-image-transport, ros-indigo-roscpp, ros-indigo-sensor-msgs, ros-indigo-std-msgs
+Description: The ohm_rrl_motiondetection package
