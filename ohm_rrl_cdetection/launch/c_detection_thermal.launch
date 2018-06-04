@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<launch>
-	<node pkg="image_transport" name="republish" type="republish" output="screen" args="compressed in:=/thermal_image_view raw out:=/thermal_image_view"/>
-	<node pkg="ohm_rrl_cdetection" name="auto_thermal_c_detect_node" type="auto_thermal_c_detect_node" output="screen" >
-		<param name="path_to_template"  value="$(find ohm_rrl_cdetection)/images/"/>
-	</node>
-</launch>
