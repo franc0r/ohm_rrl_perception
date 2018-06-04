@@ -1,0 +1,12 @@
+Source: ros-indigo-ohm-rrl-cdetection
+Section: misc
+Priority: extra
+Maintainer: gleichaufjo <gleichaufjo@todo.todo>
+Build-Depends: debhelper (>= 9.0.0), ros-indigo-catkin
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-indigo-ohm-rrl-cdetection
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, 
+Description: The ohm_rrl_cdetection package
