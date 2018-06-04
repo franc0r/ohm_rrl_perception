@@ -1,0 +1,12 @@
+Source: ros-indigo-ohm-rrl-perception
+Section: misc
+Priority: extra
+Maintainer: Christian Pfitzner <christian.pfitzner@th-nuernberg.de>
+Build-Depends: debhelper (>= 9.0.0), ros-indigo-catkin
+Homepage: 
+Standards-Version: 3.9.2
+
+Package: ros-indigo-ohm-rrl-perception
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}, ros-indigo-ohm-rrl-motiondetection, ros-indigo-ohm-rrl-perception-launch, ros-indigo-ohm-rrl-perception-utility
+Description: Meta package for the perception in the robocup rescue league
