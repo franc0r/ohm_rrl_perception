@@ -11,8 +11,10 @@
     <remap from="img_selected"  to="img_perception"/>
   </node-->
 
-
-  <node pkg="image_transport" type="republish" name="uncompress" args="compressed in:=/gripper/color/image_raw raw out:=$(arg perception_topic)" />
+  
+  <node pkg="image_transport" type="republish" name="uncompress" args="compressed in:=/usb_cam/image_raw raw out:=$(arg perception_topic)" />
+  			
+  <!--<node pkg="image_transport" type="republish" name="uncompress" args="compressed in:=/gripper/color/image_raw raw out:=$(arg perception_topic)" /-->
 
 
 
@@ -33,6 +35,10 @@
       <arg name="input_image_topic" value="$(arg perception_topic)" />
       <arg name="img_qr_topic"      value="img_qr" />
   </include> 
+  
+  <!-- <group if="$(arg with_viewer)">
+    <node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />
+  </group> -->
   
   <!-- pkg="ohm_rrl_cdetection" name="auto_c_detect_node" type="auto_c_detect_node" output="screen" >
     <remap from="/gripper/color/image_raw"  to="$(arg perception_topic)"/>

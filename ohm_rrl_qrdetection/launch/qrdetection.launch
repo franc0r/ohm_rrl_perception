@@ -3,7 +3,7 @@
    <arg name="with_camera" default="false"/>
    <arg name="with_viewer" default="false"/>
    
-   <arg name="input_image_topic" default="image_raw"/>
+   <arg name="input_image_topic" default="/usb_cam/image_raw"/>
    <arg name="img_qr_topic"      default="img_qr"/>
 
    <group if="$(arg with_camera)">
@@ -24,5 +24,7 @@
 		<param name="cam_publisher_topic"       type="string" value="$(arg img_qr_topic)"/>
 		<param name="robot_radius"              type="double" value="0.3"/>
 	</node>		 
+	
+		
 
 </launch>

@@ -10,7 +10,7 @@
 
 #include <ros/ros.h>
 #include <opencv/cv.h>
-#include <Eigen/Geometry>
+#include <eigen3/Eigen/Geometry>
 #include <cmath>
 #include <math.h>
 #include <tf/transform_broadcaster.h>
@@ -23,8 +23,8 @@
 #include "laser_geometry/laser_geometry.h"
 #include <geometry_msgs/Point.h>
 
-#include "ohm_perception_msgs/QrArray.h"
-#include "ohm_perception_msgs/Qr.h"
+#include "ohm_rrl_perception_msgs/QrArray.h"
+#include "ohm_rrl_perception_msgs/Qr.h"
 
 
 class QrCodeToWorld {

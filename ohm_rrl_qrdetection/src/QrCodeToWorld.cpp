@@ -10,8 +10,11 @@
 #include <visualization_msgs/Marker.h>
 #include <geometry_msgs/Point.h>
 
+
 const double EPSILON = 0.000001;
 float _minDistance = 0.5f;
+
+
 
 QrCodeToWorld::QrCodeToWorld()
 {
