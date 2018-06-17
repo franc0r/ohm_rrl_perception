@@ -16,6 +16,7 @@
 
 
 image_transport::Publisher pubSwitch;
+image_transport::Subscriber imgSub;
 bool param = false;
 
 //Callback function to republish image_raw topic as switch topic
@@ -29,7 +30,13 @@ void callCam(const sensor_msgs::ImageConstPtr& camImage)
 bool service(std_srvs::SetBool::Request& req, std_srvs::SetBool::Response& res)
 {
   std::cout << "service bool " << std::endl;
+  std::cout << "param val before service "  << param << std::endl;
   param = req.data;
+
+  std::cout << "param val after service "  << param << std::endl;
+
+  if(param)
+        imgSub.shutdown();
   return true;
 }
 
@@ -45,12 +52,12 @@ int main(int argc, char** argv)
   sensor_msgs::ImagePtr msg;
 
   //Subscriber /usb_cam/image_raw
-  image_transport::Subscriber imgSub = it.subscribe("/usb_cam/image_raw", 1, callCam);
+  imgSub = it.subscribe("/usb_cam/image_raw", 1, callCam);
   pubSwitch = it.advertise("/switch", 1);
   ros::ServiceServer serv= nh.advertiseService("BoolService", service);
 
-  if(param)
-      imgSub.shutdown();
+
+
 
   ros::spin();
 }

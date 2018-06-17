@@ -12,7 +12,7 @@
   </node-->
 
   
-  <node pkg="image_transport" type="republish" name="uncompress" args="compressed in:=/usb_cam/image_raw raw out:=$(arg perception_topic)" />
+  <node pkg="image_transport" type="republish" name="uncompress" args="compressed in:=/switch raw out:=$(arg perception_topic)" />
   			
   <!--<node pkg="image_transport" type="republish" name="uncompress" args="compressed in:=/gripper/color/image_raw raw out:=$(arg perception_topic)" /-->
 
