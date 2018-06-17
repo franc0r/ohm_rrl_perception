@@ -1,0 +1,8 @@
+<launch>
+
+	<node pkg="ohm_rrl_start_stop" type="ohm_rrl_start_stop_node" name="start_stop_sensor_test_node" >
+	</node>		 
+	
+		
+
+</launch>

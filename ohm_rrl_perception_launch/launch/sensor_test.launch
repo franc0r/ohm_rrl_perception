@@ -3,7 +3,7 @@
   <!-- topics to multiplex -->
   <arg name="driver_camera_topic" default="/usb_cam/image_raw"/>
   <arg name="manip_camera_topic"  default= "/usb_cam/image_raw"/> <!-- "/gripper/color/image_raw"/-->
-  <arg name="perception_topic"    default= "/usb_cam/image_raw"/> <!--"/gripper/color/image_raw"/--> <!--img_perception"/-->
+  <arg name="perception_topic"    default= "/switch"/> <!--"/gripper/color/image_raw"/--> <!--img_perception"/-->
 
 
 
@@ -35,6 +35,9 @@
       <arg name="input_image_topic" value="$(arg perception_topic)" />
       <arg name="img_qr_topic"      value="img_qr" />
   </include> 
+  
+  <include file="$(find ohm_rrl_start_stop)/launch/startstop.launch">
+  </include>
   
   <!-- <group if="$(arg with_viewer)">
     <node pkg="rqt_image_view" type="rqt_image_view" name="rqt_image_view" />

@@ -1,0 +1,59 @@
+/**
+ * @file   ohm_rrl_start_stop.cpp
+ * @author Johanna Gleichauf
+ * @date   Stand 16.06.2018
+ *
+ *
+ */
+#include <cstdlib>
+#include <opencv2/opencv.hpp>
+#include <ros/ros.h>
+#include <sensor_msgs/Image.h>
+#include <sensor_msgs/image_encodings.h>
+#include <image_transport/image_transport.h>
+#include <cv_bridge/cv_bridge.h>
+#include <std_srvs/SetBool.h>
+
+
+image_transport::Publisher pubSwitch;
+bool param = false;
+
+//Callback function to republish image_raw topic as switch topic
+void callCam(const sensor_msgs::ImageConstPtr& camImage)
+{
+  std::cout << "callback camera " << std::endl;
+  pubSwitch.publish(camImage);
+
+}
+
+bool service(std_srvs::SetBool::Request& req, std_srvs::SetBool::Response& res)
+{
+  std::cout << "service bool " << std::endl;
+  param = req.data;
+  return true;
+}
+
+
+/** @function main */
+int main(int argc, char** argv)
+{
+  ros::init(argc, argv, "camera");
+  ros::NodeHandle nh;
+  ros::NodeHandle private_nh("~");
+
+  image_transport::ImageTransport it(nh);
+  sensor_msgs::ImagePtr msg;
+
+  //Subscriber /usb_cam/image_raw
+  image_transport::Subscriber imgSub = it.subscribe("/usb_cam/image_raw", 1, callCam);
+  pubSwitch = it.advertise("/switch", 1);
+  ros::ServiceServer serv= nh.advertiseService("BoolService", service);
+
+  if(param)
+      imgSub.shutdown();
+
+  ros::spin();
+}
+
+
+
