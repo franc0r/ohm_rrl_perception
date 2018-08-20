@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-	<node pkg="image_transport" name="republish" type="republish" output="screen" args="compressed in:=/gripper/color/image_raw raw out:=/gripper/color/image_raw"/>
+	<node pkg="image_transport" name="republish" type="republish" output="screen" args="compressed in:=/usb_cam/image_raw raw out:=/usb_cam/image_raw"/>
+	<!--<node pkg="image_transport" name="republish" type="republish" output="screen" args="compressed in:=/gripper/color/image_raw raw out:=/gripper/color/image_raw"/> -->
 	<node pkg="ohm_rrl_cdetection" name="auto_c_detect_node" type="auto_c_detect_node" output="screen" >
 	  <!--<remap from="/gripper/color/image_raw"  to="img_perception"/>-->
 	  <param name="path_to_template"  value="$(find ohm_rrl_cdetection)/images/"/>
