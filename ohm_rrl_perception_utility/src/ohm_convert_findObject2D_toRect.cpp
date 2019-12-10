@@ -21,7 +21,7 @@ ros::Publisher                       _label_pub;
 
 
 ros::Publisher marker_pub;
-ros::Subscriber image_sub;
+ros::Subscriber image_sub; //test
 
 
 std::map<unsigned int, std::string> _label;
