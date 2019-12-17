@@ -237,14 +237,29 @@ int main(int argc, char** argv)
    _label[12]  = "Combustible";
    _label[13]  = "Dangerous When Wet";
    _label[14]  = "Organic Peroxide";
-   _label[35]  = "Inhalation Hazard 6";
-   _label[36]  = "Toxic 6";
-   _label[37]  = "Radioactive 7";
-   _label[38]  = "Corrosive 8";
-   _label[39]  = "Stripes 9";
+   _label[35]  = "Inhalation Hazard";
+   _label[36]  = "Toxic";
+   _label[37]  = "Radioactive";
+   _label[38]  = "Corrosive";
+   _label[39]  = "Stripes";
    _label[40]  = "Dangerous";
-   _label[41]  = "Explosives 1.1 1";
-   _label[42]  = "Explosives 1.1A 1";
+//   _label[41]  = "Explosives";
+//   _label[42]  = "Explosives 1.1A 1";
+   _label[43]  = "Flammable Gas";
+//   _label[44]  = ""
+   _label[45]  = "Non-flammable gas";
+   _label[46]  = "Oxygen";
+   _label[47]  = "Combustible";
+   _label[48]  = "Flammable";
+   _label[49]  = "Fuel oil";
+   _label[50]  = "Gasoline";
+   _label[51]  = "Dangerous when wet";
+   _label[52]  = "Flammable solid";
+   _label[53]  = "Spontaneously combustible";
+   _label[54]  = "Oxidiser";
+   _label[55]  = "Organic peroxide";
+   _label[56]  = "Poison";
+
 
 
    ros::spin();
