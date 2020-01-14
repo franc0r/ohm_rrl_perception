@@ -7,8 +7,15 @@ project(ohm_rrl_qrdetection)
 find_package(catkin REQUIRED COMPONENTS
   			 roscpp
   			 std_msgs
+  			 geometry_msgs
+  			 visualization_msgs
+          tf
           cv_bridge
           image_transport
+          sensor_msgs
+          laser_geometry
+          ohm_rrl_perception_msgs
+          pcl_ros
 )
 find_package(OpenCV REQUIRED)
 find_package(cmake_modules REQUIRED)
@@ -116,25 +123,26 @@ link_directories($ENV{OBVIOUSLY_ROOT}/build/release/obcore
 # )
 
 ## Declare a cpp executable
-add_executable(ohm_rrl_qrdetection_node  src/ohm_qr_detection_node.cpp src/QrCodeDetection.cpp
+add_executable(ohm_rrl_qrdetection_node  src/ohm_qr_detection_node.cpp
+									  src/QrCodeDetection.cpp
  									  )
 
-#add_executable(ohm_qr_to_world_node  src/ohm_qr_to_world_node.cpp
-#									 src/QrCodeToWorld.cpp)
-#
-#add_executable(ohm_qr_stack_node  src/qr_stack_node.cpp
-# 									  )
+add_executable(ohm_rrl_qr_to_world_node  src/ohm_qr_to_world_node.cpp
+									 src/QrCodeToWorldRealSense.cpp)
+
+add_executable(ohm_rrl_qr_stack_node  src/qr_realsense_stack_node.cpp
+ 									  )
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(ohm_rrl_qrdetection_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#add_dependencies(ohm_qr_to_world_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-#add_dependencies(ohm_qr_stack_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ohm_rrl_qr_to_world_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(ohm_rrl_qr_stack_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ohm_rrl_qrdetection_node ${catkin_LIBRARIES}  ${OpenCV_LIBS} zbar)
-#target_link_libraries(ohm_qr_to_world_node ${catkin_LIBRARIES})
-#target_link_libraries(ohm_qr_stack_node ${catkin_LIBRARIES})
+target_link_libraries(ohm_rrl_qrdetection_node ${catkin_LIBRARIES} obcore obvision  ${OpenCV_LIBS} zbar)
+target_link_libraries(ohm_rrl_qr_to_world_node ${catkin_LIBRARIES})
+target_link_libraries(ohm_rrl_qr_stack_node ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -151,7 +159,7 @@ target_link_libraries(ohm_rrl_qrdetection_node ${catkin_LIBRARIES}  ${OpenCV_LIB
 # )
 
 ## Mark executables and/or libraries for installation
-install(TARGETS ohm_rrl_qrdetection_node #ohm_qr_to_world_node ohm_qr_stack_node
+install(TARGETS ohm_rrl_qrdetection_node ohm_rrl_qr_to_world_node ohm_rrl_qr_stack_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
    RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}

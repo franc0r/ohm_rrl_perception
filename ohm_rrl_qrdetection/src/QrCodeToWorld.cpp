@@ -5,8 +5,7 @@
  *      Author: jon
  */
 
-#include "../../ohm_rrl_qrdetection/src/QrCodeToWorld.h"
-
+#include "QrCodeToWorld.h"
 #include <visualization_msgs/Marker.h>
 #include <geometry_msgs/Point.h>
 
@@ -15,24 +14,26 @@ float _minDistance = 0.5f;
 
 QrCodeToWorld::QrCodeToWorld()
 {
-	_A <<  545.248893f, 0.0f, 305.559000f, 0.0f, 546.279802f, 250.026233f,  0.0f, 0.0f, 1.0f;
+	//TODO Camera matrix needs to be adapted to the intel realsense camera matrix
+	_A <<  545.248893f, 0.0f, 305.559000f, 0.0f, 546.279802f, 250.026233f,  0.0f, 0.0f, 1.0f; // Camera matrix
 	ros::NodeHandle prvNh("~");
 	std::string qrTopic;
 	std::string laserTopic;
 
-	prvNh.param("qr_topic",     		qrTopic,    	std::string("/qr/pose_left_cam"));
-	prvNh.param("laser_topic", 			laserTopic, 	std::string("/georg/scan"));
-	prvNh.param("tf_qr_frame", 			_tfQrFrame, 	std::string("/tf_qr_left"));
-	prvNh.param("tf_laser_frame", 		_tfLaserFrame, 	std::string("georg/laser"));
-	prvNh.param("tf_cam_frame", 		_tfCamFrame,	std::string("georg/camera/left"));
-	prvNh.param("tf_map_frame", 		_tfMapFrame, 	std::string("map"));
+	prvNh.param("qr_topic",     		qrTopic,    	std::string("/qr/pose")); ///qr/pose_left_cam
+	prvNh.param("laser_topic", 			laserTopic, 	std::string("/scan")); ///georg/scan
+	prvNh.param("tf_qr_frame", 			_tfQrFrame, 	std::string("/tf_qr")); ///tf_qr_left
+	prvNh.param("tf_laser_frame", 		_tfLaserFrame, 	std::string("/velodyne")); ///georg/laser
+	prvNh.param("tf_cam_frame", 		_tfCamFrame,	std::string("/laser")); ///georg/camera/left
+	prvNh.param("tf_map_frame", 		_tfMapFrame, 	std::string("/map"));
 	prvNh.param("qr_intersection_frame", 	_qrIntersectionFrame, 	std::string("/qr/candidate"));
+
 
 	_qrSubs     		= _nh.subscribe(qrTopic, 1, &QrCodeToWorld::qrCallBack, this);
 	_laserSubs  		= _nh.subscribe(laserTopic, 1, &QrCodeToWorld::laserCallback, this);
 	_cloudPub   		= _nh.advertise<sensor_msgs::PointCloud>("/my_cloud",1);
 	_markerPub  		= _nh.advertise<visualization_msgs::Marker>("visualization_marker", 5);
-	_qrIntersectionPub	= _nh.advertise<ohm_perception_msgs::Qr>(_qrIntersectionFrame, 5);
+	_qrIntersectionPub	= _nh.advertise<ohm_rrl_perception_msgs::Qr>(_qrIntersectionFrame, 5);
 }
 
 QrCodeToWorld::~QrCodeToWorld()
@@ -40,8 +41,11 @@ QrCodeToWorld::~QrCodeToWorld()
 
 }
 
+//TODO This needs to be replaced by the transformation and projection for the intel realsense camera or new node
+//TODO 3D Markers and coordinates are necessary
 void QrCodeToWorld::qrCallBack(const ohm_perception_msgs::QrArray& qr)
 {
+  std::cout << "entered qrCallBack " << std::endl;
 	//i the future probably _qrArray will not be required
 	cv::Point qrCenter;
 	for(unsigned int i= 0; i < qr.qr.size(); i++)
@@ -56,8 +60,10 @@ void QrCodeToWorld::qrCallBack(const ohm_perception_msgs::QrArray& qr)
 		p = (Eigen::AngleAxisf(M_PI_2, Eigen::Vector3f::UnitY()) * Eigen::AngleAxisf(-M_PI_2, Eigen::Vector3f::UnitZ())).matrix() * ray;
 
 		tf::StampedTransform transformCamera;
+		ros::Time t1 = ros::Time(0);
 		try{
-			_listener.lookupTransform(_tfMapFrame, _tfCamFrame, ros::Time(0), transformCamera);
+		 // _listener.waitForTransform(_tfMapFrame, _tfCamFrame, t1, ros::Duration(4.0));
+			_listener.lookupTransform( _tfMapFrame, _tfCamFrame, t1, transformCamera); /// _listener.lookupTransform(_tfMapFrame, _tfCamFrame, ros::Time(0), transformCamera)
 		}
 		catch (tf::TransformException &ex)
 		{
@@ -100,12 +106,15 @@ void QrCodeToWorld::qrCallBack(const ohm_perception_msgs::QrArray& qr)
 		marker.points[1].x= p(0);
 		marker.points[1].y= p(1);
 		marker.points[1].z= 0.0;//p.z();
+		std::cout << "publish marker " << std::endl;
 		_markerPub.publish(marker);
 
 
 		tf::StampedTransform transformLaser;
+		ros::Time t2 = ros::Time(0);
 		try{
-			_listener.lookupTransform(_tfMapFrame, _tfLaserFrame, ros::Time(0), transformLaser);
+		  //_listener.waitForTransform(_tfMapFrame, _tfLaserFrame, t2, ros::Duration(4.0));
+			_listener.lookupTransform(_tfMapFrame, _tfLaserFrame, t2, transformLaser); //_listener.lookupTransform(_tfMapFrame, _tfLaserFrame, ros::Time(0), transformLaser)
 		}
 		catch (tf::TransformException &ex)
 		{
@@ -196,6 +205,7 @@ void QrCodeToWorld::qrCallBack(const ohm_perception_msgs::QrArray& qr)
 
 					_qr.pose.position.x = result.x;//float(pL1(0));
 					_qr.pose.position.y = result.y;//float(pL1(1));
+					std::cout << "publish QR intersection candidate " << std::endl;
 					_qrIntersectionPub.publish(_qr);
 					break;
 				}
@@ -209,7 +219,9 @@ void QrCodeToWorld::qrCallBack(const ohm_perception_msgs::QrArray& qr)
 //void QrCodeToWorld::laserCallBack(const sensor_msgs::LaserScan& scan)
 void QrCodeToWorld::laserCallback (const sensor_msgs::LaserScan::ConstPtr& scan_in)
 {
-	_projector.transformLaserScanToPointCloud(_tfLaserFrame,*scan_in, _laserCloud, _listener);
+  sensor_msgs::LaserScan dummy = *scan_in;
+  dummy.header.frame_id = "laser";
+	_projector.transformLaserScanToPointCloud(_tfLaserFrame, dummy, _laserCloud, _listener);
 	_cloudPub.publish(_laserCloud);
 }
 

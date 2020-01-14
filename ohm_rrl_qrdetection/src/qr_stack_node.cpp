@@ -68,6 +68,7 @@ void sendMarkers(void)
 	{
 		marker.header.stamp = ros::Time();
 		marker.id = i;
+		// TODO This needs to be done in 3D
 		marker.pose.position.x = _qrIntersections.qr[i].pose.position.x;
 		marker.pose.position.y = _qrIntersections.qr[i].pose.position.y;
 		_markers.markers.push_back(marker);

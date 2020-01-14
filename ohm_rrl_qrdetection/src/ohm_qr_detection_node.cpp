@@ -6,8 +6,7 @@
  */
 
 #include <ros/ros.h>
-
-#include "../../ohm_rrl_qrdetection/src/QrCodeDetection.h"
+#include "QrCodeDetection.h"
 
 int main(int argc, char** argv)
 {
@@ -16,6 +15,7 @@ int main(int argc, char** argv)
   QrCodeDetection qrCodeDetection;
 
   ros::spin();
+//  qrCodeDetection.run();
 
   return 0;
 }
