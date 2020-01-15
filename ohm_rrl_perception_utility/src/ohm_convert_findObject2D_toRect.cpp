@@ -259,7 +259,12 @@ int main(int argc, char** argv)
    _label[54]  = "Oxidiser";
    _label[55]  = "Organic peroxide";
    _label[56]  = "Poison";
-
+  // _label[57]  = "Infectio"
+   _label[58]  = "Fissile";
+   _label[59]  = "Radioactive I";
+   _label[60]  = "Radioactive II";
+   _label[61]  = "Radioactive III";
+   _label[62]  = "Cargo Aircraft Only";
 
 
    ros::spin();

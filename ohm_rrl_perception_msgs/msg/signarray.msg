@@ -1,0 +1,9 @@
+Header header
+uint32 imgWidth
+uint32 imgHeight
+string camera
+geometry_msgs/Point coords
+uint8 type
+ohm_rrl_perception_msgs/signmsg[] signs
+uint8 TYPE_QR=0
+uint8 TYPE_HAZ=1
