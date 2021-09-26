@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/opt/ros/noetic/include/**",
+        "/media/data/catkin_ws/devel/include/**",
+        "/media/data/catkin_ws/src/imu_tools/imu_complementary_filter/include/**",
+        "/media/data/catkin_ws/src/imu_tools/imu_filter_madgwick/include/**",
+        "/media/data/catkin_ws/src/imu_viz/include/**",
+        "/media/data/catkin_ws/src/log_data/include/**",
+        "/media/data/catkin_ws/src/ohm_preception_fit_plane/include/**",
+        "/media/data/catkin_ws/src/ohm_sensors_gripper/include/**",
+        "/media/data/catkin_ws/src/ohm_visualization_tof/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}
