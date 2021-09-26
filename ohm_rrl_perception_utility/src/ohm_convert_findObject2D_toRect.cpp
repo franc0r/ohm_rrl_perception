@@ -228,35 +228,35 @@ int main(int argc, char** argv)
    _label[2]   = "Non-Flammable-Gas";
    _label[4]   = "Flammable Liquid";
    _label[5]   = "Flammable Solid";
-   _label[6]   = "Oxidizer";
+  //  _label[6]   = "Oxidizer";
    _label[7]   = "Radioactive II";
    _label[8]   = "Corrosive";
-   _label[9]   = "Inhalation Hazard";
+  //  _label[9]   = "Inhalation Hazard";
    _label[10]  = "Infectious Substance";
    _label[11]  = "Explosive";
    _label[12]  = "Combustible";
    _label[13]  = "Dangerous When Wet";
    _label[14]  = "Organic Peroxide";
    _label[35]  = "Inhalation Hazard";
-   _label[36]  = "Toxic";
+  //  _label[36]  = "Toxic";
    _label[37]  = "Radioactive";
    _label[38]  = "Corrosive";
    _label[39]  = "Stripes";
    _label[40]  = "Dangerous";
-//   _label[41]  = "Explosives";
-//   _label[42]  = "Explosives 1.1A 1";
+  //  _label[41]  = "Explosives 1.1 1";
+  // _labelk[42]  = "Explosives 1.1A 1";
    _label[43]  = "Flammable Gas";
 //   _label[44]  = ""
    _label[45]  = "Non-flammable gas";
    _label[46]  = "Oxygen";
    _label[47]  = "Combustible";
-   _label[48]  = "Flammable";
+  //  _label[48]  = "Flammable";
    _label[49]  = "Fuel oil";
    _label[50]  = "Gasoline";
    _label[51]  = "Dangerous when wet";
    _label[52]  = "Flammable solid";
    _label[53]  = "Spontaneously combustible";
-   _label[54]  = "Oxidiser";
+  //  _label[54]  = "Oxidiser";
    _label[55]  = "Organic peroxide";
    _label[56]  = "Poison";
   // _label[57]  = "Infectio"
@@ -265,6 +265,10 @@ int main(int argc, char** argv)
    _label[60]  = "Radioactive II";
    _label[61]  = "Radioactive III";
    _label[62]  = "Cargo Aircraft Only";
+  //  _label[63]  = "Inhalation Hazard New";
+   _label[64]  = "Explosives-1.1-1";
+   _label[65]  = "Blasting Agents-1.5-1";
+   _label[66]  = "Oxidizer";//update
 
 
    ros::spin();
