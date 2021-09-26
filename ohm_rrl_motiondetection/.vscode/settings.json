@@ -1,0 +1,13 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/media/data/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ],
+    "files.associations": {
+        "tuple": "cpp"
+    },
+    "python.analysis.extraPaths": [
+        "/media/data/catkin_ws/devel/lib/python3/dist-packages",
+        "/opt/ros/noetic/lib/python3/dist-packages"
+    ]
+}
