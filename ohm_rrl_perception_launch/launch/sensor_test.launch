@@ -17,7 +17,7 @@
 
 
   <param name="/motiondetection/show_cluster_circles" value="true"/>
-  <include file="$(find ohm_rrl_motiondetection)/launch/motiondetection.launch" >
+  <include file="$(find ohm_rrl_motiondetection2)/launch/motiondetection.launch" >
       <arg name="input_image_topic" value="$(arg perception_topic)" />
       <arg name="img_motion_topic"  value="img_motion" />
   </include>  
