@@ -2,6 +2,7 @@
 
   <arg name="with_camera" default="false"/>
   <arg name="with_viewer" default="false"/>
+  <arg name="perception_topic"    default= "/gripper/color/image_raw"/> <!--"/gripper/color/image_raw"/--> <!--img_perception"/-->
   
   
   <!-- start camera -->
@@ -18,20 +19,23 @@
   </group>
   
   
-  <include file="$(find ohm_rrl_motiondetection)/launch/motiondetection.launch" >
-      <arg name="input_image_topic" value="img_perception" />
+  <include file="$(find ohm_rrl_motiondetection2)/launch/motiondetection.launch" >
+      <arg name="input_image_topic" value="$(arg perception_topic)" unless="$(arg with_camera)"/>
+      <arg name="input_image_topic" value="/img_perception" if="$(arg with_camera)"/>
       <arg name="img_motion_topic"  value="img_motion" />
   </include>  
   
   
   <include file="$(find ohm_rrl_perception_utility)/launch/hazmatdetection.launch" >
-      <arg name="input_image_topic" value="img_perception" />
+      <arg name="input_image_topic" value="$(arg perception_topic)" unless="$(arg with_camera)"/>
+      <arg name="input_image_topic" value="/img_perception" if="$(arg with_camera)"/>
       <arg name="img_haz_topic"     value="img_hazmats" />
   </include>  
   
   
   <include file="$(find ohm_rrl_qrdetection)/launch/qrdetection.launch" >
-      <arg name="input_image_topic" value="img_perception" />
+      <arg name="input_image_topic" value="$(arg perception_topic)" unless="$(arg with_camera)"/>
+      <arg name="input_image_topic" value="/img_perception" if="$(arg with_camera)" />
       <arg name="img_qr_topic"     value="img_qr" />
   </include> 
   
