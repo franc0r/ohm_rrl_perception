@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
 )
 
-find_package(OpenCV 4 REQUIRED)    
+find_package(OpenCV 3 REQUIRED)    
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -fopenmp -Wall -O2 -std=c++11")
 
  generate_dynamic_reconfigure_options(
