@@ -232,7 +232,7 @@ int main(int argc, char** argv)
 //    _label[7]   = "Radioactive II";
 //    _label[8]   = "Corrosive";
 //   //  _label[9]   = "Inhalation Hazard";
-//    _label[10]  = "Infectious Substance";
+   _label[10]  = "Infectious Substance";
 //    _label[11]  = "Explosive";
 //    _label[12]  = "Combustible";
 //    _label[13]  = "Dangerous When Wet";
@@ -285,6 +285,33 @@ int main(int argc, char** argv)
   _label[75]  = "Flammable Gas";
   _label[76]  = "Corrosive";
   _label[77]  = "Oxygen";
+  _label[78]  = "Fire Extingusher";
+  _label[79]  = "Fire Extingusher";
+  _label[80]  = "Fire Extingusher";
+  _label[81]  = "Fire Extingusher";
+  _label[82]  = "Fire Extingusher";
+  _label[83]  = "Fire Extingusher";
+  _label[84]  = "Fire Extingusher";
+  _label[85]  = "Fire Extingusher";
+  _label[86]  = "Fire Extingusher";
+  _label[87]  = "Fire Extingusher";
+  _label[88]  = "Fire Extingusher";
+  _label[89]  = "Fire Extingusher";
+  _label[90]  = "Fire Extingusher";
+  _label[91]  = "Fire Extingusher";
+  _label[92]  = "Fire Extingusher";
+  _label[93]  = "Fire Extingusher";
+  _label[94]  = "Fire Extingusher";
+  _label[95]  = "Fire Extingusher";
+  _label[96]  = "Fire Extingusher";
+  _label[97]  = "Explosive";
+  _label[98]  = "Explosive";
+  _label[99]  = "Fire Extingusher";
+  _label[100]  = "Flammable Solid";
+  _label[101]  = "Dangerous when Wet";
+  _label[102]  = "Spontaneously Combustible";
+  _label[103]  = "Dangerous when Wet";
+
 
 
    ros::spin();
