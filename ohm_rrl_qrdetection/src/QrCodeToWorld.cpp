@@ -15,19 +15,19 @@ float _minDistance = 0.5f;
 QrCodeToWorld::QrCodeToWorld()
 {
 	//TODO Camera matrix needs to be adapted to the intel realsense camera matrix
-	_A <<  545.248893f, 0.0f, 305.559000f, 0.0f, 546.279802f, 250.026233f,  0.0f, 0.0f, 1.0f; // Camera matrix
+	// _A <<  545.248893f, 0.0f, 305.559000f, 0.0f, 546.279802f, 250.026233f,  0.0f, 0.0f, 1.0f; // Camera matrix
+	_A <<  1131.6, 0.0f, 674.43, 0.0f, 1138.93, 276.46,  0.0f, 0.0f, 1.0f; // Camera matrix
 	ros::NodeHandle prvNh("~");
 	std::string qrTopic;
 	std::string laserTopic;
 
-	prvNh.param("qr_topic",     		qrTopic,    	std::string("/qr/pose")); ///qr/pose_left_cam
+	prvNh.param("qr_topic",     		qrTopic,    	std::string("/qr/detected")); ///qr/pose_left_cam
 	prvNh.param("laser_topic", 			laserTopic, 	std::string("/scan")); ///georg/scan
 	prvNh.param("tf_qr_frame", 			_tfQrFrame, 	std::string("/tf_qr")); ///tf_qr_left
-	prvNh.param("tf_laser_frame", 		_tfLaserFrame, 	std::string("/velodyne")); ///georg/laser
-	prvNh.param("tf_cam_frame", 		_tfCamFrame,	std::string("/laser")); ///georg/camera/left
+	prvNh.param("tf_laser_frame", 		_tfLaserFrame, 	std::string("/laser")); ///georg/laser
+	prvNh.param("tf_cam_frame", 		_tfCamFrame,	std::string("/astra")); ///georg/camera/left
 	prvNh.param("tf_map_frame", 		_tfMapFrame, 	std::string("/map"));
-	prvNh.param("qr_intersection_frame", 	_qrIntersectionFrame, 	std::string("/qr/candidate"));
-
+	prvNh.param("qr_intersection_frame", 	_qrIntersectionFrame, 	std::string("/qr/localized"));
 
 	_qrSubs     		= _nh.subscribe(qrTopic, 1, &QrCodeToWorld::qrCallBack, this);
 	_laserSubs  		= _nh.subscribe(laserTopic, 1, &QrCodeToWorld::laserCallback, this);
@@ -43,7 +43,7 @@ QrCodeToWorld::~QrCodeToWorld()
 
 //TODO This needs to be replaced by the transformation and projection for the intel realsense camera or new node
 //TODO 3D Markers and coordinates are necessary
-void QrCodeToWorld::qrCallBack(const ohm_perception_msgs::QrArray& qr)
+void QrCodeToWorld::qrCallBack(const ohm_rrl_perception_msgs::QrArray& qr)
 {
   std::cout << "entered qrCallBack " << std::endl;
 	//i the future probably _qrArray will not be required
@@ -76,38 +76,38 @@ void QrCodeToWorld::qrCallBack(const ohm_perception_msgs::QrArray& qr)
 		p = rotation * p + translation;
 
 		unsigned int id = 0;//one for each marker
-		visualization_msgs::Marker marker;
+		// visualization_msgs::Marker marker;
 
-		//show an ARROW in RViz. color: green
-		marker.header.frame_id = "map";
-		marker.header.stamp = ros::Time();
-		marker.id = id++;
-		marker.type = visualization_msgs::Marker::ARROW;
-		marker.action = visualization_msgs::Marker::ADD;
-		marker.lifetime.sec = 2;
-		marker.pose.position.x = 0;
-		marker.pose.position.y = 0;
-		marker.pose.position.z = 0;
-		marker.pose.orientation.x = 0.0;
-		marker.pose.orientation.y = 0.0;
-		marker.pose.orientation.z = 0.0;
-		marker.pose.orientation.w = 1.0;
-		marker.scale.x = 0.025;
-		marker.scale.y = 0.1;
-		marker.scale.z = 0.05;
-		marker.color.a = 0.5;
-		marker.color.r = 0.0;
-		marker.color.g = 1.0;
-		marker.color.b = 0.0;
-		marker.points.resize(2);
-		marker.points[0].x= transformCamera.getOrigin().x();
-		marker.points[0].y= transformCamera.getOrigin().y();
-		marker.points[0].z= 0.0;
-		marker.points[1].x= p(0);
-		marker.points[1].y= p(1);
-		marker.points[1].z= 0.0;//p.z();
-		std::cout << "publish marker " << std::endl;
-		_markerPub.publish(marker);
+		// //show an ARROW in RViz. color: green
+		// marker.header.frame_id = "map";
+		// marker.header.stamp = ros::Time();
+		// marker.id = id++;
+		// marker.type = visualization_msgs::Marker::SPHERE;
+		// marker.action = visualization_msgs::Marker::ADD;
+		// marker.lifetime.sec = 2;
+		// marker.pose.position.x = 0;
+		// marker.pose.position.y = 0;
+		// marker.pose.position.z = 0;
+		// marker.pose.orientation.x = 0.0;
+		// marker.pose.orientation.y = 0.0;
+		// marker.pose.orientation.z = 0.0;
+		// marker.pose.orientation.w = 1.0;
+		// marker.scale.x = 0.025;
+		// marker.scale.y = 0.1;
+		// marker.scale.z = 0.05;
+		// marker.color.a = 0.5;
+		// marker.color.r = 0.0;
+		// marker.color.g = 1.0;
+		// marker.color.b = 0.0;
+		// marker.points.resize(2);
+		// marker.points[0].x= transformCamera.getOrigin().x();
+		// marker.points[0].y= transformCamera.getOrigin().y();
+		// marker.points[0].z= 0.0;
+		// marker.points[1].x= p(0);
+		// marker.points[1].y= p(1);
+		// marker.points[1].z= 0.0;//p.z();
+		// std::cout << "publish marker " << std::endl;
+		// _markerPub.publish(marker);
 
 
 		tf::StampedTransform transformLaser;
@@ -207,6 +207,33 @@ void QrCodeToWorld::qrCallBack(const ohm_perception_msgs::QrArray& qr)
 					_qr.pose.position.y = result.y;//float(pL1(1));
 					std::cout << "publish QR intersection candidate " << std::endl;
 					_qrIntersectionPub.publish(_qr);
+
+					visualization_msgs::Marker marker;
+
+					//show an ARROW in RViz. color: green
+					marker.header.frame_id = "map";
+					marker.header.stamp = ros::Time();
+					marker.id = id++;
+					marker.type = visualization_msgs::Marker::SPHERE;
+					marker.action = visualization_msgs::Marker::ADD;
+					marker.lifetime.sec = 2;
+					marker.pose.position.x = result.x;
+					marker.pose.position.y = result.y;
+					marker.pose.position.z = 0;
+					marker.pose.orientation.x = 0.0;
+					marker.pose.orientation.y = 0.0;
+					marker.pose.orientation.z = 0.0;
+					marker.pose.orientation.w = 1.0;
+					marker.scale.x = 0.025;
+					marker.scale.y = 0.1;
+					marker.scale.z = 0.05;
+					marker.color.a = 0.5;
+					marker.color.r = 0.0;
+					marker.color.g = 1.0;
+					marker.color.b = 0.0;
+					std::cout << "publish marker for x = " << result.x << ", y = " << result.y << std::endl;
+					_markerPub.publish(marker);
+
 					break;
 				}
 			}
@@ -250,6 +277,7 @@ bool QrCodeToWorld::isPointOnLine(cv::Point2f a, cv::Point2f b, cv::Point2f c)
 //	cv::Point2f bTmp(c.x - a.x, c.y - a.y);
 //	double r = crossProduct(aTmp, bTmp);
 //	return abs(r) < EPSILON;
+	return false;
 }
 
 bool QrCodeToWorld::isPointRightOfLine(cv::Point2f a, cv::Point2f b, cv::Point2f c)

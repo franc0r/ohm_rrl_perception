@@ -3,8 +3,8 @@
    <arg name="with_camera" default="false"/>
    <arg name="with_viewer" default="false"/>
    
-   <arg name="input_image_topic" default="image_raw"/>
-   <arg name="img_qr_topic"      default="img_qr"/>
+   <arg name="input_image_topic" default="/astra/image_raw"/>
+   <arg name="img_qr_topic"      default="/qr/debug_image"/>
 
    <group if="$(arg with_camera)">
      <node pkg="usb_cam" type="usb_cam_node" name="usb_cam">
@@ -16,13 +16,16 @@
      </node>
    </group>
 
-
-
-	<node pkg="ohm_rrl_qrdetection" type="ohm_rrl_qrdetection_node" name="qr_sensor_test_node" >
-		<param name="qr_topic"                  type="string" value="qr "/>
+	<node pkg="ohm_rrl_qrdetection" type="ohm_rrl_qrdetection_node" name="qr_detector" >
+		<param name="qr_topic"                  type="string" value="qr/detected"/>
 		<param name="cam_subscriber_topic"   	  type="string" value="$(arg input_image_topic)"/>
 		<param name="cam_publisher_topic"       type="string" value="$(arg img_qr_topic)"/>
 		<param name="robot_radius"              type="double" value="0.3"/>
-	</node>		 
+	</node>
+
+  <node pkg="ohm_rrl_qrdetection" type="ohm_rrl_qr_to_world_node" name="qr_pose_estimator" output="screen">
+    <param name="qr_topic"     type="string" value="qr/detected" />
+    <param name="tf_cam_frame" type="string" value="/astra" />
+  </node>
 
 </launch>

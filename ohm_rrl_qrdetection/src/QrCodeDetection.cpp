@@ -26,7 +26,7 @@ QrCodeDetection::QrCodeDetection()
    int height = 0;
    double rateVar = 0.0;
 
-   prvNh.param("qr_topic", qrTopic, std::string("/qr/pose"));
+   prvNh.param("qr_topic", qrTopic, std::string("/qr/detected"));
    prvNh.param("cam_publisher_topic", camPubTopic, std::string("image/qr_detection_left"));
    prvNh.param("cam_subscriber_topic", camSubTopic, std::string("/image")); //original: /image_raw
 

@@ -127,8 +127,11 @@ add_executable(ohm_rrl_qrdetection_node  src/ohm_qr_detection_node.cpp
 									  src/QrCodeDetection.cpp
  									  )
 
-add_executable(ohm_rrl_qr_to_world_node  src/ohm_qr_to_world_node.cpp
-									 src/QrCodeToWorldRealSense.cpp)
+add_executable(ohm_rrl_qr_to_world_node
+  src/ohm_qr_to_world_node.cpp
+  # src/QrCodeToWorldRealSense.cpp
+  src/QrCodeToWorld.cpp
+)
 
 add_executable(ohm_rrl_qr_stack_node  src/qr_realsense_stack_node.cpp
  									  )
@@ -140,7 +143,14 @@ add_dependencies(ohm_rrl_qr_to_world_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${
 add_dependencies(ohm_rrl_qr_stack_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(ohm_rrl_qrdetection_node ${catkin_LIBRARIES} obcore obvision  ${OpenCV_LIBS} zbar)
+target_link_libraries(
+  ohm_rrl_qrdetection_node
+  ${catkin_LIBRARIES}
+  # obcore
+  # obvision
+  ${OpenCV_LIBS}
+  zbar
+)
 target_link_libraries(ohm_rrl_qr_to_world_node ${catkin_LIBRARIES})
 target_link_libraries(ohm_rrl_qr_stack_node ${catkin_LIBRARIES})
 

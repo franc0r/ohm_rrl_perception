@@ -6,13 +6,13 @@
  */
 
 #include <ros/ros.h>
-#include "QrCodeToWorldRealSense.h"
+#include "QrCodeToWorld.h"
 
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "oh_qr_to_world_node");
 
-  QrCodeToWorldRealSense qrCodeToWorldRealSense;
+  QrCodeToWorld qrCodeToWorld;
 
 //  qrCodeToWorld.run();
   ros::spin();
