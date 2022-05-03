@@ -14,15 +14,7 @@ find_package(catkin REQUIRED COMPONENTS
   cv_bridge
 )
 
-
-
-if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
-  find_package(Qt5Widgets REQUIRED)
-else()
-  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
-  include(${QT_USE_FILE})
-endif()
-
+find_package(Qt5 REQUIRED COMPONENTS Gui)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -162,7 +154,7 @@ add_executable(hazmat_viz_node src/ohm_convert_findObject2D_toRect.cpp)
 ## Specify libraries to link a library or executable target against
  target_link_libraries(hazmat_viz_node
    ${catkin_LIBRARIES}
-   ${QT_LIBRARIES} 
+   Qt5::Gui
    ${OpenCV_LIBS}
    
  )

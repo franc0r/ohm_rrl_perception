@@ -90,7 +90,7 @@ void QrCodeDetection::imageCallBack(const sensor_msgs::ImageConstPtr& imageRos) 
 
       ROS_INFO_STREAM("text_pos" << text_pos);
 
-      cv::putText(_frame, _qrs[i].label, text_pos, cv::FONT_HERSHEY_SIMPLEX,           1.2, cvScalar(0,255,0), 2, CV_AA);
+      cv::putText(_frame, _qrs[i].label, text_pos, cv::FONT_HERSHEY_SIMPLEX,           1.2, cvScalar(0,255,0), 2, cv::LINE_AA);
       //cv::line(_frame, imageCenter, cv::Point(_qrArray.qr.at(i).u, _qrArray.qr.at(i).v), cv::Scalar(0, 255, 0), 3);
       std::cout << "found qr: " << _qrs[i].label << std::endl;
     }

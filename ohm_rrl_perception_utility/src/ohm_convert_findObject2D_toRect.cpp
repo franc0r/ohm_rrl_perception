@@ -180,9 +180,9 @@ void imgCallback(const sensor_msgs::ImageConstPtr& img)
        cv::line(frame, _detected_haz[i].corners[j], _detected_haz[i].corners[(j+1)%4], cv::Scalar(0, 0, 255), 3);
 //       cv::circle(frame, _detected_haz[i].one_corner, 80, cv::Scalar(255,0,0), 3);
        cv::putText(frame, _detected_haz[i].label, _detected_haz[i].corners[0], cv::FONT_HERSHEY_COMPLEX_SMALL,
-                 0.8, cvScalar(200,200,250), 1, CV_AA);
+                 0.8, cvScalar(200,200,250), 1, cv::LINE_AA);
        cv::putText(frame, _detected_haz[i].label, cv::Point(20, (i+1)*20), cv::FONT_HERSHEY_COMPLEX_SMALL,
-                 0.8, cvScalar(200,200,250), 1, CV_AA);
+                 0.8, cvScalar(200,200,250), 1, cv::LINE_AA);
      }
    }
 
