@@ -5,7 +5,7 @@
 #include <cv_bridge/cv_bridge.h>
 namespace enc = sensor_msgs::image_encodings;
 
-#include <QTransform>
+#include <QtGui/QTransform>
 
 //#include <ohm_perception_msgs/Marker.h>
 

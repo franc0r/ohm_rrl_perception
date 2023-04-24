@@ -16,13 +16,14 @@ find_package(catkin REQUIRED COMPONENTS
 
 
 
-if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
-  find_package(Qt5Widgets REQUIRED)
-else()
-  find_package(Qt4 COMPONENTS QtCore QtGui REQUIRED)
-  include(${QT_USE_FILE})
-endif()
+#if("${qt_gui_cpp_USE_QT_MAJOR_VERSION} " STREQUAL "5 ")
+#  find_package(Qt5Widgets REQUIRED)
+#else()
+#  find_package(Qt4 COMPONENTS QtCore QtGui Gui REQUIRED)
+#  include(${QT_USE_FILE})
+#endif()
 
+find_package(Qt5 COMPONENTS Core Widgets Gui REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -164,7 +165,6 @@ add_executable(hazmat_viz_node src/ohm_convert_findObject2D_toRect.cpp)
    ${catkin_LIBRARIES}
    ${QT_LIBRARIES} 
    ${OpenCV_LIBS}
-   
  )
 
 #############

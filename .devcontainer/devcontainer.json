@@ -1,0 +1,22 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.231.6/containers/ubuntu
+{
+	"name": "OpenCV Container",
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"runArgs": [
+		"-it",
+		"--rm",
+		"--privileged",
+		"--net=host",
+		"--pid=host",
+		"--env=DISPLAY",
+		"-e",
+		"QT_X11_NO_MITSHM=1",
+		"--volume=/tmp/.X11-unix:/tmp/.X11-unix:rw"
+	  ],
+	"workspaceMount": "source=${localWorkspaceFolder},target=/root/catkin_ws/src/${localWorkspaceFolderBasename},type=bind",
+	"workspaceFolder": "/root/catkin_ws/src/${localWorkspaceFolderBasename}"
+}
+    
