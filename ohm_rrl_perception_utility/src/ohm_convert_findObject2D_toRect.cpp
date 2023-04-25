@@ -1,7 +1,6 @@
-
-#include <ros/ros.h>
-#include <opencv2/opencv.hpp>
-#include <std_msgs/Float32MultiArray.h>
+#include <rclcpp/rclcpp.hpp>
+#include <opencv2/imgproc.hpp>
+#include <std_msgs/msg/float32_multi_array.hpp>
 #include <cv_bridge/cv_bridge.h>
 namespace enc = sensor_msgs::image_encodings;
 
@@ -10,18 +9,19 @@ namespace enc = sensor_msgs::image_encodings;
 //#include <ohm_perception_msgs/Marker.h>
 
 
-#include <image_transport/image_transport.h>
+#include <image_transport/image_transport.hpp>
 
+rclcpp::Node::SharedPtr              _node;
 image_transport::Subscriber          _img_sub;        //!< subscriber to image topic
 image_transport::Publisher           _img_pub;
-ros::Publisher                       _label_pub;
+//ros::Publisher                       _label_pub;
 
 //todo: subscriber to image
 //        publish image with marker
 
 
-ros::Publisher marker_pub;
-ros::Subscriber image_sub; //test
+//ros::Publisher marker_pub;
+//ros::Subscriber image_sub; //test
 
 
 std::map<unsigned int, std::string> _label;
@@ -36,25 +36,15 @@ struct Hazmat
 
 std::vector<Hazmat> _detected_haz;
 
-
-
-
 cv::Point toCvPoint(const QPointF qt_p)
 {
   cv::Point cv_p;
   cv_p.x = qt_p.x();
   cv_p.y = qt_p.y();
-
-
   return cv_p;
-
 }
 
-
-
-
-
-void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
+void objectsDetectedCallback(const std_msgs::msg::Float32MultiArray & msg)
 {
   if(_img_pub.getNumSubscribers() == 0) return;
 
@@ -74,10 +64,10 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
 
          cv::Mat homography(3,3, CV_64F);
 
-         for(unsigned int j=0; j<homography.cols*homography.rows ; ++j)
+         for(int j=0; j<homography.cols*homography.rows ; ++j)
          {
-           const unsigned int u = ::floor(j/3.0);
-           const unsigned int v = j%3;
+           //const unsigned int u = ::floor(j/3.0);
+           //const unsigned int v = j%3;
            homography.at<float>(j) = msg.data[i + 3+j];
 //           std::cout << j << " " << homography.at<float>(/*loor(j/3.0),j%3*/ j) << std::endl; //msg.data[i + 3+j];
          }
@@ -99,7 +89,7 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
          std::vector<cv::Point2f> scene_corners(4);
 
          if(obj_corners.size() != scene_corners.size())
-           ROS_ERROR("Missmatch");
+           RCLCPP_ERROR(_node->get_logger(), "Missmatch");
 
          cv::perspectiveTransform( obj_corners, scene_corners, homography);
 
@@ -149,7 +139,7 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray & msg)
       }
 }
 
-void imgCallback(const sensor_msgs::ImageConstPtr& img)
+void imgCallback(const sensor_msgs::msg::Image::ConstSharedPtr &img)
 {
   // do nothing if nobody subscribes to the node
    if(_img_pub.getNumSubscribers() == 0) return;
@@ -162,10 +152,10 @@ void imgCallback(const sensor_msgs::ImageConstPtr& img)
      cv_ptr = cv_bridge::toCvCopy(img, enc::BGR8);
    }
    catch (cv_bridge::Exception& e) {
-     ROS_ERROR("cv_bridge exception: %s", e.what());
+     RCLCPP_ERROR(_node->get_logger(), "cv_bridge exception: %s", e.what());
    }
 
-   cv::Mat     frame(cv_ptr->image);
+   cv::Mat &frame = cv_ptr->image;
 
 
 //   cv::Mat H = cv::getPerspectiveTransform(frame, frame);
@@ -180,20 +170,16 @@ void imgCallback(const sensor_msgs::ImageConstPtr& img)
        cv::line(frame, _detected_haz[i].corners[j], _detected_haz[i].corners[(j+1)%4], cv::Scalar(0, 0, 255), 3);
 //       cv::circle(frame, _detected_haz[i].one_corner, 80, cv::Scalar(255,0,0), 3);
        cv::putText(frame, _detected_haz[i].label, _detected_haz[i].corners[0], cv::FONT_HERSHEY_COMPLEX_SMALL,
-                 0.8, cvScalar(200,200,250), 1, CV_AA);
+                 0.8, cvScalar(200,200,250), 1, cv::LINE_AA);
        cv::putText(frame, _detected_haz[i].label, cv::Point(20, (i+1)*20), cv::FONT_HERSHEY_COMPLEX_SMALL,
-                 0.8, cvScalar(200,200,250), 1, CV_AA);
+                 0.8, cvScalar(200,200,250), 1, cv::LINE_AA);
      }
    }
-
-
 
    cv_bridge::CvImage output;
    output.header   = img->header;
    output.encoding = enc::BGR8;
    output.image    = frame;
-
-
 
    _img_pub.publish(output.toImageMsg());
 }
@@ -201,75 +187,65 @@ void imgCallback(const sensor_msgs::ImageConstPtr& img)
 
 int main(int argc, char** argv)
 {
-   ros::init(argc, argv, "objects_detected");
+  rclcpp::init(argc, argv);
 
-   ros::NodeHandle nh;
-   ros::NodeHandle private_nh("~");
+  rclcpp::NodeOptions options;
+  _node = rclcpp::Node::make_shared("hazmat_viz_node", options);
+  image_transport::ImageTransport it(_node);
 
-   image_transport::ImageTransport      _it(nh);
+  std::string input_topic = _node->declare_parameter("input_topic", "image_raw");
+  std::string output_topic = _node->declare_parameter("viz_topic", "img_hazmats");
 
-   std::string input_topic;
-   std::string output_topic;
+  auto sub_objects = _node->create_subscription<std_msgs::msg::Float32MultiArray>("objects", rclcpp::QoS(5).reliability((rmw_qos_reliability_policy_t)2), objectsDetectedCallback);
 
-   ros::Subscriber subs;
+  _img_sub = image_transport::create_subscription(_node.get(), input_topic, imgCallback, "raw", rmw_qos_profile_sensor_data);
+  _img_pub = image_transport::create_publisher(_node.get(), output_topic, rmw_qos_profile_sensor_data);
 
-
-   private_nh.param("input_topic",   input_topic,       std::string("image_raw"));
-   private_nh.param("viz_topic",     output_topic,      std::string("img_hazmats"));
-
-   subs = nh.subscribe("objects", 1, objectsDetectedCallback);
-
-
-
-   _img_sub        = _it.subscribe(input_topic,        1, &imgCallback);
-   _img_pub        = _it.advertise(output_topic, 1);
-
-
-   _label[2]   = "Non-Flammable-Gas";
-   _label[4]   = "Flammable Liquid";
-   _label[5]   = "Flammable Solid";
-   _label[6]   = "Oxidizer";
-   _label[7]   = "Radioactive II";
-   _label[8]   = "Corrosive";
-   _label[9]   = "Inhalation Hazard";
-   _label[10]  = "Infectious Substance";
-   _label[11]  = "Explosive";
-   _label[12]  = "Spontaneously Combustible";
-   _label[13]  = "Dangerous When Wet";
-   _label[14]  = "Organic Peroxide";
-   _label[35]  = "Inhalation Hazard";
-   _label[36]  = "Toxic";
-//    _label[37]  = "Radioactive";
-//    _label[38]  = "Corrosive";
-//    _label[39]  = "Stripes";
-//    _label[40]  = "Dangerous";
-//   //  _label[41]  = "Explosives 1.1 1";
-//   // _labelk[42]  = "Explosives 1.1A 1";
-//    _label[43]  = "Flammable Gas";
-// //   _label[44]  = ""
-//    _label[45]  = "Non-flammable gas";
-//    _label[46]  = "Oxygen";
-   _label[47]  = "Combustible";
-   _label[48]  = "Flammable";
-//    _label[49]  = "Fuel oil";
-   _label[50]  = "Gasoline";
-//    _label[51]  = "Dangerous when wet";
-//    _label[52]  = "Flammable solid";
-//    _label[53]  = "Spontaneously combustible";
-//   //  _label[54]  = "Oxidiser";
-//    _label[55]  = "Organic peroxide";
-//    _label[56]  = "Poison";
-//   // _label[57]  = "Infectio"
-   _label[58]  = "Fissile";
-   _label[59]  = "Radioactive";
-//    _label[60]  = "Radioactive II";
-//    _label[61]  = "Radioactive III";
-//    _label[62]  = "Cargo Aircraft Only";
-//   //  _label[63]  = "Inhalation Hazard New";
-//    _label[64]  = "Explosives-1.1-1";
-//    _label[65]  = "Blasting Agents-1.5-1";
-//    _label[66]  = "Oxidizer";
-//update hazmats for drz 2021
+  _label[2]   = "Non-Flammable-Gas";
+  _label[4]   = "Flammable Liquid";
+  _label[5]   = "Flammable Solid";
+  _label[6]   = "Oxidizer";
+  _label[7]   = "Radioactive II";
+  _label[8]   = "Corrosive";
+  _label[9]   = "Inhalation Hazard";
+  _label[10]  = "Infectious Substance";
+  _label[11]  = "Explosive";
+  _label[12]  = "Spontaneously Combustible";
+  _label[13]  = "Dangerous When Wet";
+  _label[14]  = "Organic Peroxide";
+  _label[35]  = "Inhalation Hazard";
+  _label[36]  = "Toxic";
+  //    _label[37]  = "Radioactive";
+  //    _label[38]  = "Corrosive";
+  //    _label[39]  = "Stripes";
+  //    _label[40]  = "Dangerous";
+  //   //  _label[41]  = "Explosives 1.1 1";
+  //   // _labelk[42]  = "Explosives 1.1A 1";
+  //    _label[43]  = "Flammable Gas";
+  // //   _label[44]  = ""
+  //    _label[45]  = "Non-flammable gas";
+  //    _label[46]  = "Oxygen";
+  _label[47]  = "Combustible";
+  _label[48]  = "Flammable";
+  //    _label[49]  = "Fuel oil";
+  _label[50]  = "Gasoline";
+  //    _label[51]  = "Dangerous when wet";
+  //    _label[52]  = "Flammable solid";
+  //    _label[53]  = "Spontaneously combustible";
+  //   //  _label[54]  = "Oxidiser";
+  //    _label[55]  = "Organic peroxide";
+  //    _label[56]  = "Poison";
+  //   // _label[57]  = "Infectio"
+  _label[58]  = "Fissile";
+  _label[59]  = "Radioactive";
+  //    _label[60]  = "Radioactive II";
+  //    _label[61]  = "Radioactive III";
+  //    _label[62]  = "Cargo Aircraft Only";
+  //   //  _label[63]  = "Inhalation Hazard New";
+  //    _label[64]  = "Explosives-1.1-1";
+  //    _label[65]  = "Blasting Agents-1.5-1";
+  //    _label[66]  = "Oxidizer";
+  //update hazmats for drz 2021
   // _label[63]  = "1.5 Blasting Agents";
   // _label[64]  = "Explosives 1.1";
   // _label[65]  = "Fuel Oil";
@@ -312,9 +288,8 @@ int main(int argc, char** argv)
   _label[102]  = "Spontaneously Combustible";
   _label[103]  = "Dangerous when Wet";
 
+  rclcpp::spin(_node);
+  rclcpp::shutdown();
 
-
-   ros::spin();
-
-   return 0;
+  return 0;
 }
