@@ -288,6 +288,16 @@ int main(int argc, char** argv)
   _label[102]  = "Spontaneously Combustible";
   _label[103]  = "Dangerous when Wet";
 
+  //rrl 23 new objects
+  _label[200] = "BLUE_BARREL";
+  _label[201] = "WATER_HYDRANT";
+  _label[202] = "GREEN_CROSS";
+  _label[203] = "VALVE";
+  _label[204] = "ELEVATOR_BUTTONS";
+  _label[205] = "FUSE_BOX";
+  _label[206] = "FIRE";
+  _label[207] = "FIRE_EXTINGUISHER";
+
   rclcpp::spin(_node);
   rclcpp::shutdown();
 
